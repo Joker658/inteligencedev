@@ -82,29 +82,9 @@ function getDatabaseConnection(): PDO
     try {
         initializeDatabase($pdo);
     } catch (PDOException $exception) {
-        error_log(sprintf(
-            'Database initialization failed for DSN "%s": %s',
-            $dsn,
-            $exception->getMessage()
-        ));
-
-        throw new DatabaseConnectionException(
-            'Le service de connexion est momentanément indisponible. Veuillez réessayer ultérieurement.',
-            0,
-            $exception
-        );
+        $pdo = attemptDatabaseInitializationFallback($exception, $dsn, $options);
     } catch (Throwable $exception) {
-        error_log(sprintf(
-            'Unexpected error during database initialization for DSN "%s": %s',
-            $dsn,
-            $exception->getMessage()
-        ));
-
-        throw new DatabaseConnectionException(
-            'Le service de connexion est momentanément indisponible. Veuillez réessayer ultérieurement.',
-            0,
-            $exception
-        );
+        $pdo = attemptDatabaseInitializationFallback($exception, $dsn, $options);
     }
 
     return $pdo;
@@ -161,6 +141,56 @@ function shouldFallbackToSqlite(string $dsn): bool
     }
 
     return strpos($dsn, 'mysql:') === 0;
+}
+
+function isSqliteDsn(string $dsn): bool
+{
+    return strncasecmp($dsn, 'sqlite:', 7) === 0;
+}
+
+/**
+ * Tente une bascule vers SQLite lorsque l'initialisation de la base échoue.
+ */
+function attemptDatabaseInitializationFallback(Throwable $exception, string $dsn, array $options): PDO
+{
+    error_log(sprintf(
+        'Database initialization failed for DSN "%s": %s',
+        $dsn,
+        $exception->getMessage()
+    ));
+
+    if (!shouldFallbackToSqlite($dsn) || isSqliteDsn($dsn)) {
+        throw new DatabaseConnectionException(
+            'Le service de connexion est momentanément indisponible. Veuillez réessayer ultérieurement.',
+            0,
+            $exception
+        );
+    }
+
+    error_log(sprintf(
+        'Attempting SQLite fallback after initialization failure for DSN "%s".',
+        $dsn
+    ));
+
+    try {
+        $pdo = createSqliteConnection($options);
+        initializeDatabase($pdo);
+
+        return $pdo;
+    } catch (PDOException $sqliteException) {
+        handleDatabaseConnectionFailure($sqliteException, 'sqlite:' . getSqliteDatabasePath(), '');
+    } catch (Throwable $sqliteException) {
+        error_log(sprintf(
+            'Unexpected error during SQLite initialization: %s',
+            $sqliteException->getMessage()
+        ));
+
+        throw new DatabaseConnectionException(
+            'Le service de connexion est momentanément indisponible. Veuillez réessayer ultérieurement.',
+            0,
+            $sqliteException
+        );
+    }
 }
 
 function createSqliteConnection(array $options): PDO
