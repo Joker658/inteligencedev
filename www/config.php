@@ -33,7 +33,6 @@ function getDatabaseConnection(): PDO
     }
 
     $dsn = env('INTELLIGENCEDEV_DB_DSN', env('DB_DSN'));
-    $dsnFromEnvironment = $dsn !== null;
 
     $username = env('INTELLIGENCEDEV_DB_USER', env('DB_USER', DB_DEFAULT_USER));
     $password = env('INTELLIGENCEDEV_DB_PASS', env('DB_PASS', DB_DEFAULT_PASSWORD));
@@ -62,9 +61,16 @@ function getDatabaseConnection(): PDO
     try {
         $pdo = createPdoConnection($dsn, $username, $password, $options);
     } catch (PDOException $exception) {
-        if (!$dsnFromEnvironment && shouldFallbackToSqlite($dsn)) {
+        if (shouldFallbackToSqlite($dsn)) {
+            error_log(sprintf(
+                'Database connection failed for DSN "%s". Falling back to SQLite: %s',
+                $dsn,
+                $exception->getMessage()
+            ));
             try {
                 $pdo = createSqliteConnection($options);
+                $dsn = 'sqlite:' . getSqliteDatabasePath();
+                $username = '';
             } catch (PDOException $sqliteException) {
                 handleDatabaseConnectionFailure($sqliteException, 'sqlite:' . getSqliteDatabasePath(), '');
             }
