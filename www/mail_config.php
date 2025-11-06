@@ -15,7 +15,7 @@ const MAIL_DEFAULT_PASSWORD = 'Aurelien66290@';
 const MAIL_DEFAULT_FROM_EMAIL = 'contact@vortexdev.store';
 const MAIL_DEFAULT_FROM_NAME = 'IntelligenceDev';
 const MAIL_DEFAULT_TIMEOUT = 30;
-const MAIL_DEFAULT_EHLO_DOMAIN = 'intelligencedev.fr/';
+const MAIL_DEFAULT_EHLO_DOMAIN = 'intelligencedev.fr';
 
 /**
  * Retourne la configuration du service d'envoi de courriels.
