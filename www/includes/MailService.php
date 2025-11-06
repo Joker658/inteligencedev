@@ -139,6 +139,8 @@ HTML;
 
         try {
             $this->expectResponse($socket, [220]);
+            $ehloDomain = $this->sanitizeEhloDomain($ehloDomain, $host);
+
             $this->sendCommand($socket, 'EHLO ' . $ehloDomain, [250]);
 
             if ($encryption === 'tls') {
@@ -192,6 +194,27 @@ HTML;
         } finally {
             fclose($socket);
         }
+    }
+
+    private function sanitizeEhloDomain(string $domain, string $fallbackHost): string
+    {
+        $domain = trim($domain);
+
+        if ($domain === '') {
+            $domain = $fallbackHost;
+        }
+
+        $domain = preg_replace('#^[a-z0-9.+-]+://#i', '', $domain) ?? '';
+        $domain = preg_replace('/[^A-Za-z0-9.-]/', '', $domain) ?? '';
+        $domain = rtrim($domain, '.');
+
+        if ($domain === '') {
+            $fallback = preg_replace('/[^A-Za-z0-9.-]/', '', $fallbackHost) ?? '';
+
+            return $fallback !== '' ? $fallback : 'localhost';
+        }
+
+        return $domain;
     }
 
     private function sendCommand($socket, string $command, array $expectedCodes): void
