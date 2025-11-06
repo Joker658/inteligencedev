@@ -1,0 +1,8 @@
+# Ignore generated SQLite database files
+*.sqlite
+
+# Ignore any other runtime artifacts placed in this directory
+*
+
+# But keep this .gitignore file itself
+!.gitignore
