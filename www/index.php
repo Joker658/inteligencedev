@@ -43,7 +43,7 @@ if (isPostRequest()) {
             $result = attemptLogin($loginData['identifier'], $password);
 
             if ($result['success']) {
-                header('Location: /index.php');
+                header('Location: ./');
                 exit;
             }
 
@@ -75,18 +75,18 @@ $csrfToken = getCsrfToken();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IntelligenceDev Scripts</title>
     <link rel="icon" type="image/png" href="/img/Favicon.png">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body<?= $initialModal ? ' data-initial-modal="' . htmlspecialchars($initialModal, ENT_QUOTES, 'UTF-8') . '"' : ''; ?>>
 <header class="site-header">
     <div class="container">
         <div class="branding">
-            <a href="/index.php" class="logo-link" aria-label="Accueil IntelligenceDev">
+            <a href="./" class="logo-link" aria-label="Accueil IntelligenceDev">
                 <img src="/img/LogoWeb.png" alt="IntelligenceDev" class="logo-image">
             </a>
         </div>
         <nav class="main-nav">
-            <a href="/index.php" class="nav-link">Accueil</a>
+            <a href="./" class="nav-link">Accueil</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
                     <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>
@@ -119,7 +119,7 @@ $csrfToken = getCsrfToken();
             <p>Découvrez une collection de scripts optimisés pour automatiser vos tâches et accélérer vos développements.</p>
             <div class="hero-actions">
                 <a class="button primary" href="#catalogue">Explorer le catalogue</a>
-                <button type="button" class="button secondary" data-modal-target="register-modal">Rejoindre la communauté</button>
+                <a class="button secondary" href="https://discord.gg/56PKPnSgn5">Rejoindre la communauté</a>
             </div>
         </div>
     </section>
