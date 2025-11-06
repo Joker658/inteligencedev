@@ -475,6 +475,7 @@ final class AuthService
 
         $message = $exception->getMessage();
 
-        return stripos($message, 'Unknown column') !== false;
+        return stripos($message, 'Unknown column') !== false
+            || stripos($message, 'no such column') !== false;
     }
 }
