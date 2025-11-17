@@ -177,7 +177,7 @@ final class AuthService
                 return [
                     'success' => false,
                     'errors' => [
-                        'Votre adresse e-mail n\'a pas encore été vérifiée. Saisissez le code reçu par e-mail sur la page de vérification.',
+                        'Votre adresse e-mail n\'a pas encore été vérifiée. Rendez-vous sur la page dédiée et indiquez le code qui vous a été affiché lors de la création du compte.',
                     ],
                 ];
             }
@@ -236,7 +236,7 @@ final class AuthService
         if ($email === '' || $code === '') {
             return [
                 'success' => false,
-                'errors' => ['Veuillez renseigner votre adresse e-mail et le code reçu.'],
+                'errors' => ['Veuillez renseigner votre adresse e-mail et le code communiqué lors de votre inscription.'],
             ];
         }
 

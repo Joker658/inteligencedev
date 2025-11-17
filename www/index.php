@@ -6,6 +6,7 @@ $globalErrors = consumeGlobalErrors();
 $loginErrors = [];
 $registerErrors = [];
 $registerSuccess = false;
+$registerVerificationCode = null;
 $initialModal = null;
 $loginData = [
     'identifier' => ''
@@ -57,6 +58,7 @@ if (isPostRequest()) {
                 $registerSuccess = true;
                 $registerData = ['username' => '', 'email' => ''];
                 $registerErrors = [];
+                $registerVerificationCode = $result['verification_code'] ?? null;
                 $initialModal = 'register-modal';
             } else {
                 $registerErrors = array_merge($registerErrors, $result['errors']);
@@ -200,7 +202,13 @@ $csrfToken = getCsrfToken();
         <p class="modal-subtitle">Inscrivez-vous pour accéder à notre catalogue de scripts exclusifs.</p>
 
         <?php if ($registerSuccess): ?>
-            <div class="alert success">Compte créé avec succès ! Nous vous avons envoyé un code de vérification par e-mail. Rendez-vous sur la <a href="/includes/verify_email.php">page dédiée</a> pour activer votre compte.</div>
+            <div class="alert success">
+                <p>Compte créé avec succès ! Utilisez le code de vérification ci-dessous pour activer votre compte dans les 30 prochaines minutes :</p>
+                <?php if ($registerVerificationCode): ?>
+                    <p class="verification-code">Code : <strong><?= htmlspecialchars($registerVerificationCode, ENT_QUOTES, 'UTF-8'); ?></strong></p>
+                <?php endif; ?>
+                <p>Rendez-vous sur la <a href="/includes/verify_email.php">page de vérification</a> pour saisir le code.</p>
+            </div>
         <?php endif; ?>
 
         <?php if ($registerErrors): ?>
