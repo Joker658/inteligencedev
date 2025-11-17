@@ -3,6 +3,7 @@ require_once __DIR__ . '/../functions.php';
 
 $errors = [];
 $success = false;
+$verificationCode = null;
 $formData = [
     'username' => '',
     'email' => '',
@@ -22,6 +23,7 @@ if (isPostRequest()) {
 
         if ($result['success']) {
             $success = true;
+            $verificationCode = $result['verification_code'] ?? null;
             $formData = ['username' => '', 'email' => ''];
         } else {
             $errors = array_merge($errors, $result['errors']);
@@ -65,7 +67,13 @@ $csrfToken = getCsrfToken();
         <p>Inscrivez-vous pour accéder à notre catalogue de scripts exclusifs.</p>
 
         <?php if ($success): ?>
-            <div class="alert success">Compte créé avec succès ! Un code de vérification vient d'être envoyé à votre adresse e-mail. Saisissez-le sur la <a href="/includes/verify_email.php">page de vérification</a> pour activer votre compte.</div>
+            <div class="alert success">
+                <p>Compte créé avec succès ! Utilisez le code suivant dans les 30 prochaines minutes pour activer votre compte :</p>
+                <?php if ($verificationCode): ?>
+                    <p class="verification-code">Code : <strong><?= htmlspecialchars($verificationCode, ENT_QUOTES, 'UTF-8'); ?></strong></p>
+                <?php endif; ?>
+                <p>Rendez-vous sur la <a href="/includes/verify_email.php">page de vérification</a> pour saisir le code.</p>
+            </div>
         <?php endif; ?>
 
         <?php if ($errors): ?>

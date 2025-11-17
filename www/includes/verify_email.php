@@ -3,6 +3,7 @@ require_once __DIR__ . '/../functions.php';
 
 $errors = [];
 $success = false;
+$resentCode = null;
 $formData = [
     'email' => '',
     'code' => '',
@@ -39,6 +40,7 @@ if (isPostRequest()) {
             if ($result['success']) {
                 $resendSuccess = true;
                 $resendErrors = [];
+                $resentCode = $result['verification_code'] ?? null;
                 regenerateCsrfToken();
             } else {
                 $resendErrors = array_merge($resendErrors, $result['errors']);
@@ -91,7 +93,7 @@ $csrfToken = getCsrfToken();
         <?php endif; ?>
 
         <h1>Vérifier mon adresse e-mail</h1>
-        <p>Entrez l'adresse e-mail utilisée lors de votre inscription ainsi que le code à six chiffres reçu par e-mail.</p>
+        <p>Entrez l'adresse e-mail utilisée lors de votre inscription ainsi que le code à six chiffres affiché après la création du compte ou après une régénération.</p>
 
         <?php if ($success): ?>
             <div class="alert success">Votre adresse e-mail a bien été vérifiée. Vous pouvez maintenant <a href="/includes/login.php">vous connecter</a>.</div>
@@ -119,11 +121,16 @@ $csrfToken = getCsrfToken();
             <button type="submit" class="button primary full">Confirmer mon e-mail</button>
         </form>
         <section class="resend-section">
-            <h2>Pas reçu de code ?</h2>
-            <p>Demandez l'envoi d'un nouveau code à partir de votre adresse e-mail.</p>
+            <h2>Besoin d'un nouveau code ?</h2>
+            <p>Générez un nouveau code de vérification ci-dessous. Il sera affiché directement sur cette page.</p>
 
             <?php if ($resendSuccess): ?>
-                <div class="alert success">Un nouveau code vient de vous être envoyé. Pensez à vérifier votre dossier spam si nécessaire.</div>
+                <div class="alert success">
+                    <p>Un nouveau code vient d'être généré. Saisissez-le dans le formulaire ci-dessus dans les 30 prochaines minutes.</p>
+                    <?php if ($resentCode): ?>
+                        <p class="verification-code">Nouveau code : <strong><?= htmlspecialchars($resentCode, ENT_QUOTES, 'UTF-8'); ?></strong></p>
+                    <?php endif; ?>
+                </div>
             <?php endif; ?>
 
             <?php if ($resendErrors): ?>

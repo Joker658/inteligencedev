@@ -360,6 +360,14 @@ input:focus {
     text-decoration: underline;
 }
 
+.verification-code {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-top: 0.75rem;
+    text-transform: uppercase;
+}
+
 .form-footer {
     margin-top: 1.25rem;
     color: var(--text-muted);
