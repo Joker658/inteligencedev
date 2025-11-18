@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 final class AuthService
 {
     private PDO $pdo;
@@ -89,10 +90,13 @@ final class AuthService
             }
 
             $passwordColumn = $this->resolvePasswordColumn();
+            $verificationCode = $this->generateVerificationCode();
+            $expiresAt = (new DateTimeImmutable('+30 minutes'))->format('Y-m-d H:i:s');
 
             $insert = $this->pdo->prepare(
                 sprintf(
-                    'INSERT INTO users (username, email, %s, email_verified_at) VALUES (:username, :email, :password, CURRENT_TIMESTAMP)',
+                    'INSERT INTO users (username, email, %s, email_verification_code, verification_code_expires_at, email_verified_at)
+                    VALUES (:username, :email, :password, :verification_code, :expires_at, NULL)',
                     $passwordColumn
                 )
             );
@@ -100,6 +104,8 @@ final class AuthService
                 'username' => $username,
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
+                'verification_code' => $verificationCode,
+                'expires_at' => $expiresAt,
             ]);
 
             $userId = (int) $this->pdo->lastInsertId();
@@ -120,6 +126,80 @@ final class AuthService
             'user_id' => $userId,
             'email' => $email,
             'username' => $username,
+            'verification_code' => isset($verificationCode) ? $verificationCode : null,
+        ];
+    }
+
+    /**
+     * @return array{success: bool, errors: string[]}
+     */
+    public function verifyEmail(int $userId, string $code): array
+    {
+        $code = trim($code);
+
+        if ($code === '') {
+            return [
+                'success' => false,
+                'errors' => ['Veuillez saisir le code de vérification.'],
+            ];
+        }
+
+        $statement = $this->pdo->prepare(
+            'SELECT email_verification_code, verification_code_expires_at, email_verified_at FROM users WHERE id = :id LIMIT 1'
+        );
+        $statement->execute(['id' => $userId]);
+
+        $user = $statement->fetch();
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'errors' => ['Compte introuvable. Veuillez recommencer la procédure d\'inscription.'],
+            ];
+        }
+
+        if (!empty($user['email_verified_at'])) {
+            return [
+                'success' => true,
+                'errors' => [],
+            ];
+        }
+
+        $expectedCode = (string) ($user['email_verification_code'] ?? '');
+
+        if ($expectedCode === '') {
+            return [
+                'success' => false,
+                'errors' => ['Ce compte ne possède pas de code de vérification actif.'],
+            ];
+        }
+
+        if (isset($user['verification_code_expires_at']) && $user['verification_code_expires_at']) {
+            $expiresAt = new DateTimeImmutable($user['verification_code_expires_at']);
+
+            if ($expiresAt < new DateTimeImmutable('now')) {
+                return [
+                    'success' => false,
+                    'errors' => ['Le code de vérification a expiré. Veuillez créer un nouveau compte.'],
+                ];
+            }
+        }
+
+        if (!hash_equals($expectedCode, $code)) {
+            return [
+                'success' => false,
+                'errors' => ['Le code renseigné est incorrect.'],
+            ];
+        }
+
+        $update = $this->pdo->prepare(
+            'UPDATE users SET email_verified_at = CURRENT_TIMESTAMP, email_verification_code = NULL, verification_code_expires_at = NULL WHERE id = :id'
+        );
+        $update->execute(['id' => $userId]);
+
+        return [
+            'success' => true,
+            'errors' => [],
         ];
     }
 
@@ -275,5 +355,10 @@ final class AuthService
         $message = $exception->getMessage();
 
         return stripos($message, 'Unknown column') !== false;
+    }
+
+    private function generateVerificationCode(): string
+    {
+        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
 }
