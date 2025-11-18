@@ -7,7 +7,6 @@ $formData = [
     'email' => '',
 ];
 $globalErrors = consumeGlobalErrors();
-$successMessage = null;
 
 if (isPostRequest()) {
     $formData['username'] = trim($_POST['username'] ?? '');
@@ -21,8 +20,14 @@ if (isPostRequest()) {
         $result = registerUser($formData['username'], $formData['email'], $password);
 
         if ($result['success']) {
-            $successMessage = 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.';
-            $formData = ['username' => '', 'email' => ''];
+            setPendingVerification([
+                'user_id' => $result['user_id'],
+                'email' => $result['email'],
+                'code' => $result['verification_code'],
+            ]);
+
+            header('Location: /includes/verify.php');
+            exit;
         } else {
             $errors = array_merge($errors, $result['errors']);
         }
@@ -63,10 +68,6 @@ $csrfToken = getCsrfToken();
 
         <h1>Créer un compte</h1>
         <p>Inscrivez-vous pour accéder à notre catalogue de scripts exclusifs.</p>
-
-        <?php if ($successMessage): ?>
-            <div class="alert success"><?= htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8'); ?> <a href="/includes/login.php">Se connecter</a></div>
-        <?php endif; ?>
 
         <?php if ($errors): ?>
             <div class="alert error">

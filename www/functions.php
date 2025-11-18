@@ -66,7 +66,9 @@ function attemptLogin(string $identifier, string $password): array
  *     success: bool,
  *     errors: string[],
  *     email: string|null,
- *     username: string|null
+ *     username: string|null,
+ *     user_id: int|null,
+ *     verification_code: string|null
  * }
  */
 function registerUser(string $username, string $email, string $password): array
@@ -79,6 +81,8 @@ function registerUser(string $username, string $email, string $password): array
             'errors' => [$exception->getMessage()],
             'email' => $email,
             'username' => $username,
+            'user_id' => null,
+            'verification_code' => null,
         ];
     }
 
@@ -88,6 +92,8 @@ function registerUser(string $username, string $email, string $password): array
             'errors' => $result['errors'],
             'email' => $result['email'],
             'username' => $result['username'],
+            'user_id' => $result['user_id'] ?? null,
+            'verification_code' => $result['verification_code'] ?? null,
         ];
     }
 
@@ -98,7 +104,24 @@ function registerUser(string $username, string $email, string $password): array
         'errors' => [],
         'email' => $result['email'],
         'username' => $result['username'],
+        'user_id' => $result['user_id'],
+        'verification_code' => $result['verification_code'] ?? null,
     ];
+}
+
+/**
+ * @return array{success: bool, errors: string[]}
+ */
+function verifyEmailCode(int $userId, string $code): array
+{
+    try {
+        return getAuthService()->verifyEmail($userId, $code);
+    } catch (DatabaseConnectionException $exception) {
+        return [
+            'success' => false,
+            'errors' => [$exception->getMessage()],
+        ];
+    }
 }
 
 function logoutUser(): void
@@ -199,4 +222,37 @@ function consumeGlobalErrors(): array
     $_SESSION['global_errors'] = [];
 
     return $errors;
+}
+
+function setPendingVerification(array $data): void
+{
+    $_SESSION['pending_verification'] = [
+        'user_id' => isset($data['user_id']) ? (int) $data['user_id'] : null,
+        'email' => isset($data['email']) ? (string) $data['email'] : '',
+        'code' => isset($data['code']) ? (string) $data['code'] : '',
+    ];
+}
+
+function getPendingVerification(): ?array
+{
+    if (!isset($_SESSION['pending_verification']) || !is_array($_SESSION['pending_verification'])) {
+        return null;
+    }
+
+    $pending = $_SESSION['pending_verification'];
+
+    if (!isset($pending['user_id']) || $pending['user_id'] === null) {
+        return null;
+    }
+
+    return [
+        'user_id' => (int) $pending['user_id'],
+        'email' => isset($pending['email']) ? (string) $pending['email'] : '',
+        'code' => isset($pending['code']) ? (string) $pending['code'] : '',
+    ];
+}
+
+function clearPendingVerification(): void
+{
+    unset($_SESSION['pending_verification']);
 }
