@@ -13,6 +13,12 @@ $resendData = [
     'email' => '',
 ];
 $globalErrors = consumeGlobalErrors();
+$registrationFlash = null;
+
+if (isset($_SESSION['verification_flash'])) {
+    $registrationFlash = $_SESSION['verification_flash'];
+    unset($_SESSION['verification_flash']);
+}
 
 if (isPostRequest()) {
     $action = $_POST['action'] ?? 'verify';
@@ -58,6 +64,13 @@ if (isPostRequest()) {
     }
 }
 
+$prefillFromFlash = $registrationFlash && !isPostRequest();
+
+if ($prefillFromFlash) {
+    $formData['email'] = $registrationFlash['email'] ?? '';
+    $resendData['email'] = $registrationFlash['email'] ?? '';
+}
+
 $csrfToken = getCsrfToken();
 ?>
 <!DOCTYPE html>
@@ -92,6 +105,16 @@ $csrfToken = getCsrfToken();
 
         <h1>Vérifier mon adresse e-mail</h1>
         <p>Entrez l'adresse e-mail utilisée lors de votre inscription ainsi que le code à six chiffres reçu par e-mail.</p>
+
+        <?php if ($registrationFlash): ?>
+            <div class="alert success">
+                <p>Bienvenue sur IntelligenceDev ! Nous avons prérempli votre e-mail pour gagner du temps.</p>
+                <?php if (!empty($registrationFlash['code'])): ?>
+                    <p>Votre code de vérification est : <strong><?= htmlspecialchars($registrationFlash['code'], ENT_QUOTES, 'UTF-8'); ?></strong></p>
+                <?php endif; ?>
+                <p>Il reste valable pendant 30 minutes, pensez à le conserver en lieu sûr.</p>
+            </div>
+        <?php endif; ?>
 
         <?php if ($success): ?>
             <div class="alert success">Votre adresse e-mail a bien été vérifiée. Vous pouvez maintenant <a href="/includes/login.php">vous connecter</a>.</div>

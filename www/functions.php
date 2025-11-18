@@ -75,7 +75,13 @@ function attemptLogin(string $identifier, string $password): array
 }
 
 /**
- * @return array{success: bool, errors: string[]}
+ * @return array{
+ *     success: bool,
+ *     errors: string[],
+ *     email: string|null,
+ *     username: string|null,
+ *     verification_code: string|null
+ * }
  */
 function registerUser(string $username, string $email, string $password): array
 {
@@ -85,6 +91,9 @@ function registerUser(string $username, string $email, string $password): array
         return [
             'success' => false,
             'errors' => [$exception->getMessage()],
+            'email' => $email,
+            'username' => $username,
+            'verification_code' => null,
         ];
     }
 
@@ -92,6 +101,9 @@ function registerUser(string $username, string $email, string $password): array
         return [
             'success' => false,
             'errors' => $result['errors'],
+            'email' => $result['email'],
+            'username' => $result['username'],
+            'verification_code' => null,
         ];
     }
 
@@ -111,6 +123,9 @@ function registerUser(string $username, string $email, string $password): array
         return [
             'success' => false,
             'errors' => ['Impossible d\'envoyer l\'e-mail de vérification. Veuillez réessayer plus tard.'],
+            'email' => $result['email'],
+            'username' => $result['username'],
+            'verification_code' => null,
         ];
     }
 
@@ -119,6 +134,9 @@ function registerUser(string $username, string $email, string $password): array
     return [
         'success' => true,
         'errors' => [],
+        'email' => $result['email'],
+        'username' => $result['username'],
+        'verification_code' => $result['verification_code'],
     ];
 }
 

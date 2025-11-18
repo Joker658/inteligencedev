@@ -21,8 +21,13 @@ if (isPostRequest()) {
         $result = registerUser($formData['username'], $formData['email'], $password);
 
         if ($result['success']) {
-            $success = true;
-            $formData = ['username' => '', 'email' => ''];
+            $_SESSION['verification_flash'] = [
+                'email' => $result['email'],
+                'code' => $result['verification_code'],
+            ];
+
+            header('Location: /includes/verify_email.php');
+            exit;
         } else {
             $errors = array_merge($errors, $result['errors']);
         }
