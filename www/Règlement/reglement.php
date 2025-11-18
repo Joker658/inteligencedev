@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/../functions.php';
 
 $user = getCurrentUser();
 $globalErrors = consumeGlobalErrors();
@@ -43,7 +43,7 @@ if (isPostRequest()) {
             $result = attemptLogin($loginData['identifier'], $password);
 
             if ($result['success']) {
-                header('Location: /index.php');
+                header('Location: /Règlement/reglement.php');
                 exit;
             }
 
@@ -77,7 +77,7 @@ $csrfToken = getCsrfToken();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IntelligenceDev Scripts</title>
+    <title>IntelligenceDev - Règlement</title>
     <link rel="icon" type="image/png" href="/img/Favicon.png">
     <link rel="stylesheet" href="/style.css">
 </head>
@@ -91,7 +91,7 @@ $csrfToken = getCsrfToken();
         </div>
         <nav class="main-nav">
             <a href="/index.php" class="nav-link">Accueil</a>
-            <a href="/Règlement/reglement.php" class="nav-link">Règlement</a>
+            <a href="/Règlement/reglement.php" class="nav-link active">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
                     <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>
@@ -118,85 +118,81 @@ $csrfToken = getCsrfToken();
         </div>
     <?php endif; ?>
 
-    <section class="hero">
+    <section class="hero regulation-hero">
         <div class="container">
-            <h1>Boostez vos projets avec nos scripts prêts à l'emploi</h1>
-            <p>Découvrez une collection de scripts optimisés pour automatiser vos tâches et accélérer vos développements.</p>
+            <p class="breadcrumb"><a href="/index.php">Accueil</a> / Règlement</p>
+            <h1>Règlement officiel de la communauté IntelligenceDev</h1>
+            <p>Cette page détaille l'ensemble des règles à respecter sur nos plateformes : site, boutique, outils collaboratifs et serveur Discord. Chaque membre s'engage à respecter ces lignes directrices pour garantir une expérience saine et sécurisée.</p>
             <div class="hero-actions">
-                <a class="button primary" href="#catalogue">Explorer le catalogue</a>
-                <button type="button" class="button secondary" data-modal-target="register-modal">Rejoindre la communauté</button>
+                <a class="button primary" href="#principes">Découvrir les principes</a>
+                <a class="button secondary" href="mailto:contact@intelligencedev.fr">Contacter la modération</a>
             </div>
         </div>
     </section>
 
-    <section class="features" id="catalogue">
+    <section class="regulation" id="principes">
         <div class="container">
-            <h2>Pourquoi choisir IntelligenceDev ?</h2>
-            <div class="feature-grid">
-                <article class="feature">
-                    <h3>Performances optimisées</h3>
-                    <p>Nos scripts sont testés et optimisés pour offrir des performances rapides et fiables dans tous les environnements.</p>
-                </article>
-                <article class="feature">
-                    <h3>Mises à jour régulières</h3>
-                    <p>Recevez des mises à jour fréquentes et profitez des améliorations basées sur les retours de la communauté.</p>
-                </article>
-                <article class="feature">
-                    <h3>Support dédié</h3>
-                    <p>Une équipe de support réactive est disponible pour répondre à vos questions et vous accompagner.</p>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <section class="cta">
-        <div class="container">
-            <h2>Prêt à transformer vos idées en réalité ?</h2>
-            <p>Créez un compte gratuitement et accédez à tous nos scripts premium.</p>
-            <button type="button" class="button primary" data-modal-target="register-modal">Commencer maintenant</button>
-        </div>
-    </section>
-
-    <section class="regulation" id="reglement">
-        <div class="container">
-            <h2>Règlement général de la communauté</h2>
-            <p class="regulation-intro">Afin de garantir une expérience harmonieuse, ce règlement s'applique à toutes nos plateformes (site, outils de développement, Discord et autres services liés à IntelligenceDev). Toute participation implique l'acceptation de ces règles.</p>
+            <h2>Principes fondamentaux</h2>
             <div class="regulation-grid">
                 <article class="regulation-card">
-                    <h3>Développement & qualité</h3>
+                    <h3>Respect & bienveillance</h3>
                     <ul>
-                        <li>Respecter les bonnes pratiques de versionning et documenter chaque contribution.</li>
-                        <li>Tester systématiquement les scripts avant toute mise en production.</li>
-                        <li>Ne pas intégrer de dépendances non vérifiées ou à licence douteuse.</li>
+                        <li>Aucun propos insultant, discriminatoire ou diffamatoire n'est toléré.</li>
+                        <li>Les échanges privés doivent également respecter notre charte.</li>
+                        <li>La modération se réserve le droit de supprimer tout contenu jugé nuisible.</li>
                     </ul>
                 </article>
                 <article class="regulation-card">
-                    <h3>Communication & Discord</h3>
+                    <h3>Utilisation des scripts</h3>
                     <ul>
-                        <li>Adopter un ton courtois, sans propos discriminatoires ni contenu NSFW.</li>
-                        <li>Utiliser les salons dédiés (support, annonces, revues de code) pour faciliter le suivi.</li>
-                        <li>Signaler tout comportement abusif à l'équipe de modération.</li>
+                        <li>Les scripts téléchargés restent soumis aux licences précisées dans leur fiche.</li>
+                        <li>Il est interdit de revendre ou redistribuer nos produits sans accord écrit.</li>
+                        <li>Toute modification doit être documentée pour assurer la traçabilité.</li>
                     </ul>
                 </article>
                 <article class="regulation-card">
-                    <h3>Confidentialité & sécurité</h3>
+                    <h3>Sécurité & données</h3>
                     <ul>
-                        <li>Ne jamais partager d'identifiants, tokens ou données client en clair.</li>
-                        <li>Limiter les accès aux seules personnes concernées par un projet.</li>
-                        <li>Respecter le RGPD et les lois locales concernant les données collectées.</li>
+                        <li>Ne partagez jamais de mots de passe, tokens ou accès client.</li>
+                        <li>Signalez immédiatement toute faille ou comportement suspect.</li>
+                        <li>Respectez le RGPD et chiffrez les données sensibles en transit comme au repos.</li>
                     </ul>
                 </article>
                 <article class="regulation-card">
-                    <h3>Support & maintenance</h3>
+                    <h3>Support technique</h3>
                     <ul>
-                        <li>Ouvrir un ticket détaillé pour chaque demande d'assistance.</li>
-                        <li>Fournir les journaux d'erreurs et les étapes de reproduction.</li>
-                        <li>Planifier les maintenances impactantes au moins 24 h à l'avance.</li>
+                        <li>Ouvrez un ticket détaillé avec logs, captures et étapes pour faciliter l'assistance.</li>
+                        <li>Les tickets urgents doivent être justifiés par un impact en production.</li>
+                        <li>Un suivi régulier est obligatoire jusqu'à la résolution complète.</li>
                     </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="regulation regulation-extended" id="procedures">
+        <div class="container">
+            <h2>Procédures de modération</h2>
+            <div class="regulation-grid">
+                <article class="regulation-card">
+                    <h3>Signalements</h3>
+                    <p>Tout membre peut signaler un abus via le support ou en contactant directement un modérateur. Chaque signalement est enregistré et traité sous 24 heures.</p>
+                </article>
+                <article class="regulation-card">
+                    <h3>Sanctions progressives</h3>
+                    <ul>
+                        <li>Avertissement écrit</li>
+                        <li>Restriction temporaire d'accès</li>
+                        <li>Suspension définitive en cas de récidive ou de faute grave</li>
+                    </ul>
+                </article>
+                <article class="regulation-card">
+                    <h3>Recours possibles</h3>
+                    <p>Une révision peut être demandée dans les 7 jours suivant une sanction. Fournissez des éléments précis (captures, témoins, logs) pour accélérer le traitement.</p>
                 </article>
             </div>
             <div class="regulation-extra">
-                <p>Toute violation peut entraîner un avertissement, une suspension temporaire, voire une exclusion définitive des services IntelligenceDev.</p>
+                <p>Nos équipes appliquent ces procédures de manière équitable afin de protéger l'ensemble de la communauté et de préserver un environnement professionnel.</p>
                 <p class="refund-highlight"><strong>NOUS REMBOURSONS SOUS UN DÉLAI MAXIMUM DE 10 JOURS À COMPTER DE LA VALIDATION DE LA DEMANDE.</strong></p>
             </div>
         </div>
@@ -209,8 +205,7 @@ $csrfToken = getCsrfToken();
     </div>
 </footer>
 
-<?php include __DIR__ . '/includes/modals.php'; ?>
-
+<?php include __DIR__ . '/../includes/modals.php'; ?>
 <script>
 (function () {
     const body = document.body;
