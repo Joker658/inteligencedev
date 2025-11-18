@@ -91,7 +91,6 @@ $csrfToken = getCsrfToken();
         </div>
         <nav class="main-nav">
             <a href="/index.php" class="nav-link">Accueil</a>
-            <a href="/Règlement/reglement.php" class="nav-link">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
                     <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>
@@ -156,51 +155,6 @@ $csrfToken = getCsrfToken();
             <button type="button" class="button primary" data-modal-target="register-modal">Commencer maintenant</button>
         </div>
     </section>
-
-    <section class="regulation" id="reglement">
-        <div class="container">
-            <h2>Règlement général de la communauté</h2>
-            <p class="regulation-intro">Afin de garantir une expérience harmonieuse, ce règlement s'applique à toutes nos plateformes (site, outils de développement, Discord et autres services liés à IntelligenceDev). Toute participation implique l'acceptation de ces règles.</p>
-            <div class="regulation-grid">
-                <article class="regulation-card">
-                    <h3>Développement & qualité</h3>
-                    <ul>
-                        <li>Respecter les bonnes pratiques de versionning et documenter chaque contribution.</li>
-                        <li>Tester systématiquement les scripts avant toute mise en production.</li>
-                        <li>Ne pas intégrer de dépendances non vérifiées ou à licence douteuse.</li>
-                    </ul>
-                </article>
-                <article class="regulation-card">
-                    <h3>Communication & Discord</h3>
-                    <ul>
-                        <li>Adopter un ton courtois, sans propos discriminatoires ni contenu NSFW.</li>
-                        <li>Utiliser les salons dédiés (support, annonces, revues de code) pour faciliter le suivi.</li>
-                        <li>Signaler tout comportement abusif à l'équipe de modération.</li>
-                    </ul>
-                </article>
-                <article class="regulation-card">
-                    <h3>Confidentialité & sécurité</h3>
-                    <ul>
-                        <li>Ne jamais partager d'identifiants, tokens ou données client en clair.</li>
-                        <li>Limiter les accès aux seules personnes concernées par un projet.</li>
-                        <li>Respecter le RGPD et les lois locales concernant les données collectées.</li>
-                    </ul>
-                </article>
-                <article class="regulation-card">
-                    <h3>Support & maintenance</h3>
-                    <ul>
-                        <li>Ouvrir un ticket détaillé pour chaque demande d'assistance.</li>
-                        <li>Fournir les journaux d'erreurs et les étapes de reproduction.</li>
-                        <li>Planifier les maintenances impactantes au moins 24 h à l'avance.</li>
-                    </ul>
-                </article>
-            </div>
-            <div class="regulation-extra">
-                <p>Toute violation peut entraîner un avertissement, une suspension temporaire, voire une exclusion définitive des services IntelligenceDev.</p>
-                <p class="refund-highlight"><strong>NOUS REMBOURSONS SOUS UN DÉLAI MAXIMUM DE 10 JOURS À COMPTER DE LA VALIDATION DE LA DEMANDE.</strong></p>
-            </div>
-        </div>
-    </section>
 </main>
 
 <footer class="site-footer">
@@ -209,7 +163,76 @@ $csrfToken = getCsrfToken();
     </div>
 </footer>
 
-<?php include __DIR__ . '/includes/modals.php'; ?>
+<div class="modal" id="login-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-overlay" data-close-modal></div>
+    <div class="modal-content">
+        <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
+        <h2>Connexion</h2>
+        <p class="modal-subtitle">Connectez-vous pour accéder à vos scripts et à votre espace personnel.</p>
+
+        <?php if ($loginErrors): ?>
+            <div class="alert error">
+                <ul>
+                    <?php foreach ($loginErrors as $error): ?>
+                        <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <form method="post" class="form">
+            <input type="hidden" name="action" value="login">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+            <label for="login-identifier">Nom d'utilisateur ou e-mail</label>
+            <input type="text" id="login-identifier" name="identifier" value="<?= htmlspecialchars($loginData['identifier'], ENT_QUOTES, 'UTF-8'); ?>" required>
+
+            <label for="login-password">Mot de passe</label>
+            <input type="password" id="login-password" name="password" required>
+
+            <button type="submit" class="button primary full">Se connecter</button>
+        </form>
+        <p class="form-footer">Pas encore de compte ? <button type="button" class="link-button" data-switch-modal="register-modal">Inscrivez-vous ici</button>.</p>
+    </div>
+</div>
+
+<div class="modal" id="register-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-overlay" data-close-modal></div>
+    <div class="modal-content">
+        <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
+        <h2>Créer un compte</h2>
+        <p class="modal-subtitle">Inscrivez-vous pour accéder à notre catalogue de scripts exclusifs.</p>
+
+        <?php if ($registerSuccess): ?>
+            <div class="alert success">Compte créé avec succès ! Vous pouvez maintenant vous connecter.</div>
+        <?php endif; ?>
+
+        <?php if ($registerErrors): ?>
+            <div class="alert error">
+                <ul>
+                    <?php foreach ($registerErrors as $error): ?>
+                        <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <form method="post" class="form">
+            <input type="hidden" name="action" value="register">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+            <label for="register-username">Nom d'utilisateur</label>
+            <input type="text" id="register-username" name="username" value="<?= htmlspecialchars($registerData['username'], ENT_QUOTES, 'UTF-8'); ?>" required>
+
+            <label for="register-email">Adresse e-mail</label>
+            <input type="email" id="register-email" name="email" value="<?= htmlspecialchars($registerData['email'], ENT_QUOTES, 'UTF-8'); ?>" required>
+
+            <label for="register-password">Mot de passe</label>
+            <input type="password" id="register-password" name="password" required>
+
+            <button type="submit" class="button primary full">Créer mon compte</button>
+        </form>
+        <p class="form-footer">Déjà membre ? <button type="button" class="link-button" data-switch-modal="login-modal">Connectez-vous ici</button>.</p>
+    </div>
+</div>
 
 <script>
 (function () {
