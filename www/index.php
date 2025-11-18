@@ -91,6 +91,7 @@ $csrfToken = getCsrfToken();
         </div>
         <nav class="main-nav">
             <a href="/index.php" class="nav-link">Accueil</a>
+            <a href="#reglement" class="nav-link">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
                     <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>
@@ -153,6 +154,51 @@ $csrfToken = getCsrfToken();
             <h2>Prêt à transformer vos idées en réalité ?</h2>
             <p>Créez un compte gratuitement et accédez à tous nos scripts premium.</p>
             <button type="button" class="button primary" data-modal-target="register-modal">Commencer maintenant</button>
+        </div>
+    </section>
+
+    <section class="regulation" id="reglement">
+        <div class="container">
+            <h2>Règlement général de la communauté</h2>
+            <p class="regulation-intro">Afin de garantir une expérience harmonieuse, ce règlement s'applique à toutes nos plateformes (site, outils de développement, Discord et autres services liés à IntelligenceDev). Toute participation implique l'acceptation de ces règles.</p>
+            <div class="regulation-grid">
+                <article class="regulation-card">
+                    <h3>Développement & qualité</h3>
+                    <ul>
+                        <li>Respecter les bonnes pratiques de versionning et documenter chaque contribution.</li>
+                        <li>Tester systématiquement les scripts avant toute mise en production.</li>
+                        <li>Ne pas intégrer de dépendances non vérifiées ou à licence douteuse.</li>
+                    </ul>
+                </article>
+                <article class="regulation-card">
+                    <h3>Communication & Discord</h3>
+                    <ul>
+                        <li>Adopter un ton courtois, sans propos discriminatoires ni contenu NSFW.</li>
+                        <li>Utiliser les salons dédiés (support, annonces, revues de code) pour faciliter le suivi.</li>
+                        <li>Signaler tout comportement abusif à l'équipe de modération.</li>
+                    </ul>
+                </article>
+                <article class="regulation-card">
+                    <h3>Confidentialité & sécurité</h3>
+                    <ul>
+                        <li>Ne jamais partager d'identifiants, tokens ou données client en clair.</li>
+                        <li>Limiter les accès aux seules personnes concernées par un projet.</li>
+                        <li>Respecter le RGPD et les lois locales concernant les données collectées.</li>
+                    </ul>
+                </article>
+                <article class="regulation-card">
+                    <h3>Support & maintenance</h3>
+                    <ul>
+                        <li>Ouvrir un ticket détaillé pour chaque demande d'assistance.</li>
+                        <li>Fournir les journaux d'erreurs et les étapes de reproduction.</li>
+                        <li>Planifier les maintenances impactantes au moins 24 h à l'avance.</li>
+                    </ul>
+                </article>
+            </div>
+            <div class="regulation-extra">
+                <p>Toute violation peut entraîner un avertissement, une suspension temporaire, voire une exclusion définitive des services IntelligenceDev.</p>
+                <p class="refund-highlight"><strong>NOUS REMBOURSONS SOUS UN DÉLAI MAXIMUM DE 10 JOURS À COMPTER DE LA VALIDATION DE LA DEMANDE.</strong></p>
+            </div>
         </div>
     </section>
 </main>
