@@ -2,12 +2,12 @@
 require_once __DIR__ . '/../functions.php';
 
 $errors = [];
-$success = false;
 $formData = [
     'username' => '',
     'email' => '',
 ];
 $globalErrors = consumeGlobalErrors();
+$successMessage = null;
 
 if (isPostRequest()) {
     $formData['username'] = trim($_POST['username'] ?? '');
@@ -21,13 +21,8 @@ if (isPostRequest()) {
         $result = registerUser($formData['username'], $formData['email'], $password);
 
         if ($result['success']) {
-            $_SESSION['verification_flash'] = [
-                'email' => $result['email'],
-                'code' => $result['verification_code'],
-            ];
-
-            header('Location: /includes/verify_email.php');
-            exit;
+            $successMessage = 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.';
+            $formData = ['username' => '', 'email' => ''];
         } else {
             $errors = array_merge($errors, $result['errors']);
         }
@@ -69,8 +64,8 @@ $csrfToken = getCsrfToken();
         <h1>Créer un compte</h1>
         <p>Inscrivez-vous pour accéder à notre catalogue de scripts exclusifs.</p>
 
-        <?php if ($success): ?>
-            <div class="alert success">Compte créé avec succès ! Un code de vérification vient d'être envoyé à votre adresse e-mail. Saisissez-le sur la <a href="/includes/verify_email.php">page de vérification</a> pour activer votre compte.</div>
+        <?php if ($successMessage): ?>
+            <div class="alert success"><?= htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8'); ?> <a href="/includes/login.php">Se connecter</a></div>
         <?php endif; ?>
 
         <?php if ($errors): ?>
