@@ -3,9 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/mail_config.php';
 require_once __DIR__ . '/includes/AuthService.php';
-require_once __DIR__ . '/includes/MailService.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -22,17 +20,6 @@ function getAuthService(): AuthService
 
     if (!$service instanceof AuthService) {
         $service = new AuthService(getDatabaseConnection());
-    }
-
-    return $service;
-}
-
-function getMailService(): MailService
-{
-    static $service = null;
-
-    if (!$service instanceof MailService) {
-        $service = new MailService(getMailerConfig());
     }
 
     return $service;
@@ -79,8 +66,7 @@ function attemptLogin(string $identifier, string $password): array
  *     success: bool,
  *     errors: string[],
  *     email: string|null,
- *     username: string|null,
- *     verification_code: string|null
+ *     username: string|null
  * }
  */
 function registerUser(string $username, string $email, string $password): array
@@ -93,7 +79,6 @@ function registerUser(string $username, string $email, string $password): array
             'errors' => [$exception->getMessage()],
             'email' => $email,
             'username' => $username,
-            'verification_code' => null,
         ];
     }
 
@@ -103,29 +88,6 @@ function registerUser(string $username, string $email, string $password): array
             'errors' => $result['errors'],
             'email' => $result['email'],
             'username' => $result['username'],
-            'verification_code' => null,
-        ];
-    }
-
-    try {
-        getMailService()->sendVerificationEmail($result['email'], $result['username'], $result['verification_code']);
-    } catch (MailTransportException $exception) {
-        error_log('Verification email sending failed: ' . $exception->getMessage());
-
-        if (!empty($result['user_id'])) {
-            try {
-                getAuthService()->deleteUserById((int) $result['user_id']);
-            } catch (\Throwable $cleanupException) {
-                error_log('Unable to rollback user after mail failure: ' . $cleanupException->getMessage());
-            }
-        }
-
-        return [
-            'success' => false,
-            'errors' => ['Impossible d\'envoyer l\'e-mail de vérification. Veuillez réessayer plus tard.'],
-            'email' => $result['email'],
-            'username' => $result['username'],
-            'verification_code' => null,
         ];
     }
 
@@ -136,60 +98,6 @@ function registerUser(string $username, string $email, string $password): array
         'errors' => [],
         'email' => $result['email'],
         'username' => $result['username'],
-        'verification_code' => $result['verification_code'],
-    ];
-}
-
-/**
- * @return array{success: bool, errors: string[]}
- */
-function verifyEmailAddress(string $email, string $code): array
-{
-    try {
-        return getAuthService()->verifyEmail($email, $code);
-    } catch (DatabaseConnectionException $exception) {
-        return [
-            'success' => false,
-            'errors' => [$exception->getMessage()],
-        ];
-    }
-}
-
-/**
- * @return array{success: bool, errors: string[]}
- */
-function resendVerificationCode(string $email): array
-{
-    try {
-        $result = getAuthService()->resendVerificationCode($email);
-    } catch (DatabaseConnectionException $exception) {
-        return [
-            'success' => false,
-            'errors' => [$exception->getMessage()],
-        ];
-    }
-
-    if (!$result['success']) {
-        return [
-            'success' => false,
-            'errors' => $result['errors'],
-        ];
-    }
-
-    try {
-        getMailService()->sendVerificationEmail($result['email'], $result['username'], $result['verification_code']);
-    } catch (MailTransportException $exception) {
-        error_log('Resend verification email failed: ' . $exception->getMessage());
-
-        return [
-            'success' => false,
-            'errors' => ['Impossible d\'envoyer le nouveau code de vérification. Veuillez réessayer ultérieurement.'],
-        ];
-    }
-
-    return [
-        'success' => true,
-        'errors' => [],
     ];
 }
 

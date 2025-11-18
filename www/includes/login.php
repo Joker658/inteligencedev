@@ -81,7 +81,6 @@ $csrfToken = getCsrfToken();
 
             <button type="submit" class="button primary full">Se connecter</button>
         </form>
-        <p class="form-footer">Vous devez confirmer votre compte ? <a href="/includes/verify_email.php">Saisissez votre code de vérification ici</a>.</p>
         <p class="form-footer">Pas encore de compte ? <a href="/includes/register.php">Inscrivez-vous ici</a>.</p>
     </div>
 </main>

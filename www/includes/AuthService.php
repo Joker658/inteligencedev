@@ -5,7 +5,6 @@ final class AuthService
 {
     private PDO $pdo;
     private ?string $passwordColumn = null;
-    private const VERIFICATION_TTL_MINUTES = 30;
 
     public function __construct(PDO $pdo)
     {
@@ -18,15 +17,13 @@ final class AuthService
      *     errors: string[],
      *     user_id: int|null,
      *     email: string,
-     *     username: string,
-     *     verification_code: string|null
+     *     username: string
      * }
      */
     public function register(string $username, string $email, string $password): array
     {
         $errors = [];
         $userId = null;
-        $verificationCode = null;
 
         $username = trim($username);
         $email = trim($email);
@@ -53,7 +50,6 @@ final class AuthService
                 'user_id' => null,
                 'email' => $email,
                 'username' => $username,
-                'verification_code' => null,
             ];
         }
 
@@ -89,18 +85,14 @@ final class AuthService
                     'user_id' => null,
                     'email' => $email,
                     'username' => $username,
-                    'verification_code' => null,
                 ];
             }
 
             $passwordColumn = $this->resolvePasswordColumn();
-            $verificationCode = $this->generateVerificationCode();
-            $verificationHash = password_hash($verificationCode, PASSWORD_DEFAULT);
-            $expiresAt = (new \DateTimeImmutable(sprintf('+%d minutes', self::VERIFICATION_TTL_MINUTES)))->format('Y-m-d H:i:s');
 
             $insert = $this->pdo->prepare(
                 sprintf(
-                    'INSERT INTO users (username, email, %s, email_verification_code, verification_code_expires_at, email_verified_at) VALUES (:username, :email, :password, :verification_code, :expires_at, NULL)',
+                    'INSERT INTO users (username, email, %s, email_verified_at) VALUES (:username, :email, :password, CURRENT_TIMESTAMP)',
                     $passwordColumn
                 )
             );
@@ -108,8 +100,6 @@ final class AuthService
                 'username' => $username,
                 'email' => $email,
                 'password' => password_hash($password, PASSWORD_DEFAULT),
-                'verification_code' => $verificationHash,
-                'expires_at' => $expiresAt,
             ]);
 
             $userId = (int) $this->pdo->lastInsertId();
@@ -122,7 +112,6 @@ final class AuthService
             error_log('User registration failed: ' . $exception->getMessage());
             $errors[] = 'Une erreur est survenue lors de la création du compte. Veuillez réessayer plus tard.';
             $userId = null;
-            $verificationCode = null;
         }
 
         return [
@@ -131,7 +120,6 @@ final class AuthService
             'user_id' => $userId,
             'email' => $email,
             'username' => $username,
-            'verification_code' => $verificationCode,
         ];
     }
 
@@ -155,7 +143,7 @@ final class AuthService
 
             $statement = $this->pdo->prepare(
                 sprintf(
-                    'SELECT id, username, email, email_verified_at, email_verification_code, verification_code_expires_at, %s AS password_hash FROM users WHERE username = :username OR email = :email LIMIT 1',
+                    'SELECT id, username, email, email_verified_at, %s AS password_hash FROM users WHERE username = :username OR email = :email LIMIT 1',
                     $passwordColumn
                 )
             );
@@ -170,15 +158,6 @@ final class AuthService
                 return [
                     'success' => false,
                     'errors' => ['Identifiants incorrects. Veuillez réessayer.'],
-                ];
-            }
-
-            if ($user['email_verified_at'] === null) {
-                return [
-                    'success' => false,
-                    'errors' => [
-                        'Votre adresse e-mail n\'a pas encore été vérifiée. Saisissez le code reçu par e-mail sur la page de vérification.',
-                    ],
                 ];
             }
 
@@ -225,190 +204,10 @@ final class AuthService
         return $user ?: null;
     }
 
-    /**
-     * @return array{success: bool, errors: string[]}
-     */
-    public function verifyEmail(string $email, string $code): array
-    {
-        $email = trim($email);
-        $code = trim($code);
-
-        if ($email === '' || $code === '') {
-            return [
-                'success' => false,
-                'errors' => ['Veuillez renseigner votre adresse e-mail et le code reçu.'],
-            ];
-        }
-
-        try {
-            $statement = $this->pdo->prepare(
-                'SELECT id, email_verification_code, verification_code_expires_at, email_verified_at FROM users WHERE email = :email LIMIT 1'
-            );
-            $statement->execute(['email' => $email]);
-
-            $user = $statement->fetch();
-
-            if (!$user) {
-                return [
-                    'success' => false,
-                    'errors' => ['Aucun compte ne correspond à cette adresse e-mail.'],
-                ];
-            }
-
-            if ($user['email_verified_at'] !== null) {
-                return [
-                    'success' => false,
-                    'errors' => ['Cette adresse e-mail est déjà vérifiée. Vous pouvez vous connecter.'],
-                ];
-            }
-
-            if (!is_string($user['email_verification_code']) || $user['email_verification_code'] === '') {
-                return [
-                    'success' => false,
-                    'errors' => ['Aucun code de vérification actif n\'a été trouvé. Veuillez demander un nouveau code.'],
-                ];
-            }
-
-            if ($user['verification_code_expires_at']) {
-                try {
-                    $expiresAt = new \DateTimeImmutable($user['verification_code_expires_at']);
-                } catch (\Exception $exception) {
-                    $expiresAt = null;
-                }
-
-                if ($expiresAt instanceof \DateTimeImmutable && $expiresAt < new \DateTimeImmutable('now')) {
-                    return [
-                        'success' => false,
-                        'errors' => ['Le code de vérification a expiré. Veuillez demander un nouveau code.'],
-                    ];
-                }
-            }
-
-            if (!password_verify($code, $user['email_verification_code'])) {
-                return [
-                    'success' => false,
-                    'errors' => ['Le code saisi est incorrect.'],
-                ];
-            }
-
-            $update = $this->pdo->prepare(
-                'UPDATE users SET email_verified_at = CURRENT_TIMESTAMP, email_verification_code = NULL, verification_code_expires_at = NULL WHERE id = :id'
-            );
-            $update->execute(['id' => $user['id']]);
-        } catch (PDOException $exception) {
-            error_log('Email verification failed: ' . $exception->getMessage());
-
-            return [
-                'success' => false,
-                'errors' => ['Une erreur est survenue lors de la vérification de l\'adresse e-mail. Veuillez réessayer ultérieurement.'],
-            ];
-        }
-
-        return [
-            'success' => true,
-            'errors' => [],
-        ];
-    }
-
-    /**
-     * @return array{
-     *     success: bool,
-     *     errors: string[],
-     *     user_id: int|null,
-     *     email: string,
-     *     username: string,
-     *     verification_code: string|null
-     * }
-     */
-    public function resendVerificationCode(string $email): array
-    {
-        $email = trim($email);
-
-        if ($email === '') {
-            return [
-                'success' => false,
-                'errors' => ['Veuillez renseigner votre adresse e-mail.'],
-                'user_id' => null,
-                'email' => $email,
-                'username' => '',
-                'verification_code' => null,
-            ];
-        }
-
-        try {
-            $statement = $this->pdo->prepare(
-                'SELECT id, username, email_verified_at FROM users WHERE email = :email LIMIT 1'
-            );
-            $statement->execute(['email' => $email]);
-
-            $user = $statement->fetch();
-
-            if (!$user) {
-                return [
-                    'success' => false,
-                    'errors' => ['Aucun compte ne correspond à cette adresse e-mail.'],
-                    'user_id' => null,
-                    'email' => $email,
-                    'username' => '',
-                    'verification_code' => null,
-                ];
-            }
-
-            if ($user['email_verified_at'] !== null) {
-                return [
-                    'success' => false,
-                    'errors' => ['Cette adresse e-mail est déjà vérifiée. Vous pouvez vous connecter.'],
-                    'user_id' => null,
-                    'email' => $email,
-                    'username' => (string) ($user['username'] ?? ''),
-                    'verification_code' => null,
-                ];
-            }
-
-            $verificationCode = $this->generateVerificationCode();
-            $verificationHash = password_hash($verificationCode, PASSWORD_DEFAULT);
-            $expiresAt = (new \DateTimeImmutable(sprintf('+%d minutes', self::VERIFICATION_TTL_MINUTES)))->format('Y-m-d H:i:s');
-
-            $update = $this->pdo->prepare(
-                'UPDATE users SET email_verification_code = :code, verification_code_expires_at = :expires_at WHERE id = :id'
-            );
-            $update->execute([
-                'code' => $verificationHash,
-                'expires_at' => $expiresAt,
-                'id' => $user['id'],
-            ]);
-        } catch (PDOException $exception) {
-            error_log('Resend verification code failed: ' . $exception->getMessage());
-
-            return [
-                'success' => false,
-                'errors' => ['Une erreur est survenue lors de la génération d\'un nouveau code. Veuillez réessayer ultérieurement.'],
-                'user_id' => null,
-                'email' => $email,
-                'username' => '',
-                'verification_code' => null,
-            ];
-        }
-
-        return [
-            'success' => true,
-            'errors' => [],
-            'user_id' => (int) $user['id'],
-            'email' => $email,
-            'username' => (string) ($user['username'] ?? ''),
-            'verification_code' => $verificationCode,
-        ];
-    }
-
     public function deleteUserById(int $id): void
     {
         $statement = $this->pdo->prepare('DELETE FROM users WHERE id = :id LIMIT 1');
         $statement->execute(['id' => $id]);
-    }
-
-    private function generateVerificationCode(): string
-    {
-        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
 
     public function logout(): void

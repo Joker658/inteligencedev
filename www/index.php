@@ -187,7 +187,6 @@ $csrfToken = getCsrfToken();
 
             <button type="submit" class="button primary full">Se connecter</button>
         </form>
-        <p class="form-footer">Vous devez confirmer votre compte ? <a href="/includes/verify_email.php">Saisissez votre code de vérification ici</a>.</p>
         <p class="form-footer">Pas encore de compte ? <button type="button" class="link-button" data-switch-modal="register-modal">Inscrivez-vous ici</button>.</p>
     </div>
 </div>
@@ -200,7 +199,7 @@ $csrfToken = getCsrfToken();
         <p class="modal-subtitle">Inscrivez-vous pour accéder à notre catalogue de scripts exclusifs.</p>
 
         <?php if ($registerSuccess): ?>
-            <div class="alert success">Compte créé avec succès ! Nous vous avons envoyé un code de vérification par e-mail. Rendez-vous sur la <a href="/includes/verify_email.php">page dédiée</a> pour activer votre compte.</div>
+            <div class="alert success">Compte créé avec succès ! Vous pouvez maintenant vous connecter.</div>
         <?php endif; ?>
 
         <?php if ($registerErrors): ?>
