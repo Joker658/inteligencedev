@@ -54,10 +54,14 @@ if (isPostRequest()) {
             $result = registerUser($registerData['username'], $registerData['email'], $password);
 
             if ($result['success']) {
-                $registerSuccess = true;
-                $registerData = ['username' => '', 'email' => ''];
-                $registerErrors = [];
-                $initialModal = 'register-modal';
+                setPendingVerification([
+                    'user_id' => $result['user_id'],
+                    'email' => $result['email'],
+                    'code' => $result['verification_code'],
+                ]);
+
+                header('Location: /includes/verify.php');
+                exit;
             } else {
                 $registerErrors = array_merge($registerErrors, $result['errors']);
                 $initialModal = 'register-modal';
