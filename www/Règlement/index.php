@@ -147,7 +147,7 @@ $isReglementPage = strpos($currentPath, '/Règlement/') !== false;
                     <li>Fournissez des informations complètes pour accélérer l'analyse de vos incidents ou demandes de développement personnalisé.</li>
                     <li>Tout paiement lancé vaut acceptation expresse des présentes conditions.</li>
                 </ul>
-                <p class="refund-notice"><strong>Politique de remboursement&nbsp;: nous remboursons sous un délai maximum de 10 jours.</strong></p>
+                <p class="refund-notice"><strong>Politique de remboursement&nbsp;: nous remboursons sous un délai maximum de 10 jours et uniquement pour les scripts non open source.</strong></p>
                 <p>En cas de litige, une preuve d'achat et la description du problème devront être fournies pour initier la procédure.</p>
             </article>
 
