@@ -402,3 +402,46 @@ input:focus {
         padding: 2rem;
     }
 }
+.nav-link.active {
+    color: #fff;
+    font-weight: 600;
+}
+
+.hero.compact {
+    padding: 3.5rem 0 2.5rem;
+}
+
+.reglement-page {
+    flex: 1;
+}
+
+.reglement-section {
+    padding: 3rem 0 4rem;
+}
+
+.reglement-block {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+}
+
+.reglement-block h2 {
+    margin-bottom: 1rem;
+}
+
+.reglement-block ul {
+    list-style: disc;
+    margin-left: 1.2rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+.refund-notice {
+    color: #ff4d4f;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 1.25rem;
+}
