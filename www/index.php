@@ -121,7 +121,7 @@ if (!$initialModal) {
                             </div>
                             <div class="user-menu-actions">
                                 <button type="button" class="user-menu-action" disabled>Administration</button>
-                                <a href="/Mon%20Profil/index.php" class="user-menu-action<?= strpos($currentPath, '/Mon Profil/') !== false ? ' current' : ''; ?>" role="menuitem">Mon Profil</a>
+                                <a href="/Profil/index.php" class="user-menu-action<?= strpos($currentPath, '/Profil/') !== false ? ' current' : ''; ?>" role="menuitem">Mon Profil</a>
                                 <button type="button" class="user-menu-action" disabled>Paramètres</button>
                                 <a href="/includes/logout.php" class="user-menu-action danger" role="menuitem">Déconnecter</a>
                             </div>
