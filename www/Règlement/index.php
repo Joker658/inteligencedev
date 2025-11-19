@@ -23,15 +23,39 @@ $isReglementPage = strpos($currentPath, '/Règlement/') !== false;
             </a>
         </div>
         <nav class="main-nav">
-            <a href="../" class="nav-link<?= $currentPath === '../' ? ' active' : ''; ?>">Accueil</a>
-            <a href="./Règlement/" class="nav-link<?= $isReglementPage ? ' active' : ''; ?>">Règlement</a>
+            <a href="/index.php" class="nav-link<?= $currentPath === '/index.php' ? ' active' : ''; ?>">Accueil</a>
+            <a href="/Règlement/index.php" class="nav-link<?= $isReglementPage ? ' active' : ''; ?>">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
-                    <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>
-                    <a href="/includes/logout.php" class="button secondary">Déconnexion</a>
+                    <div class="user-menu" data-user-menu>
+                        <button type="button" class="user-menu-toggle" aria-haspopup="true" aria-expanded="false">
+                            <span class="user-menu-toggle-text">Bonjour</span>
+                            <span class="user-menu-toggle-name"><?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            <span class="user-menu-toggle-icon" aria-hidden="true">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                        </button>
+                        <div class="user-menu-panel" role="menu" aria-hidden="true">
+                            <div class="user-menu-info">
+                                <p class="user-menu-greeting">Bonjour :</p>
+                                <p class="user-menu-name"><?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                <?php if (!empty($user['email'])): ?>
+                                    <p class="user-menu-meta"><?= htmlspecialchars($user['email'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                <?php endif; ?>
+                            </div>
+                            <div class="user-menu-actions">
+                                <button type="button" class="user-menu-action" disabled>Administration</button>
+                                <a href="/Profil/index.php" class="user-menu-action<?= strpos($currentPath, '/Profil/') !== false ? ' current' : ''; ?>" role="menuitem">Mon Profil</a>
+                                <button type="button" class="user-menu-action" disabled>Paramètres</button>
+                                <a href="/includes/logout.php" class="user-menu-action danger" role="menuitem">Déconnecter</a>
+                            </div>
+                        </div>
+                    </div>
                 <?php else: ?>
-                    <a href="/index.php#login-modal" class="button secondary">Connexion</a>
-                    <a href="/index.php#register-modal" class="button primary">Créer un compte</a>
+                    <button type="button" class="button secondary" data-modal-target="login-modal">Connexion</button>
+                    <button type="button" class="button primary" data-modal-target="register-modal">Créer un compte</button>
                 <?php endif; ?>
             </div>
         </nav>
@@ -201,5 +225,76 @@ $isReglementPage = strpos($currentPath, '/Règlement/') !== false;
         <p>&copy; <?= date('Y'); ?> IntelligenceDev. Tous droits réservés.</p>
     </div>
 </footer>
+
+<script>
+(function () {
+    const menus = document.querySelectorAll('[data-user-menu]');
+
+    if (!menus.length) {
+        return;
+    }
+
+    const closeAll = () => {
+        menus.forEach((menu) => {
+            menu.classList.remove('open');
+            const toggle = menu.querySelector('.user-menu-toggle');
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+            const panel = menu.querySelector('.user-menu-panel');
+            if (panel) {
+                panel.setAttribute('aria-hidden', 'true');
+            }
+        });
+    };
+
+    menus.forEach((menu) => {
+        const toggle = menu.querySelector('.user-menu-toggle');
+        const panel = menu.querySelector('.user-menu-panel');
+
+        if (!toggle || !panel) {
+            return;
+        }
+
+        toggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+
+            const isOpen = menu.classList.toggle('open');
+            if (isOpen) {
+                menus.forEach((other) => {
+                    if (other !== menu) {
+                        other.classList.remove('open');
+                        const otherToggle = other.querySelector('.user-menu-toggle');
+                        const otherPanel = other.querySelector('.user-menu-panel');
+                        if (otherToggle) {
+                            otherToggle.setAttribute('aria-expanded', 'false');
+                        }
+                        if (otherPanel) {
+                            otherPanel.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            }
+
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        });
+
+        panel.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+    });
+
+    document.addEventListener('click', () => {
+        closeAll();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeAll();
+        }
+    });
+})();
+</script>
 </body>
 </html>
