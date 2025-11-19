@@ -91,6 +91,7 @@ $csrfToken = getCsrfToken();
         </div>
         <nav class="main-nav">
             <a href="/index.php" class="nav-link">Accueil</a>
+            <a href="/Règlement/index.php" class="nav-link">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
                     <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>
