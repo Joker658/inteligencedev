@@ -1,94 +1,22 @@
 <?php
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/../functions.php';
 
 $user = getCurrentUser();
-$globalErrors = consumeGlobalErrors();
-$loginErrors = [];
-$registerErrors = [];
-$registerSuccess = false;
-$initialModal = null;
-$loginData = [
-    'identifier' => ''
-];
-$registerData = [
-    'username' => '',
-    'email' => ''
-];
-
 $currentPath = $_SERVER['SCRIPT_NAME'] ?? '';
 $isReglementPage = strpos($currentPath, '/Règlement/') !== false;
-
-if (isPostRequest()) {
-    $action = $_POST['action'] ?? '';
-
-    if ($action === 'login') {
-        $loginData['identifier'] = trim($_POST['identifier'] ?? '');
-    } elseif ($action === 'register') {
-        $registerData['username'] = trim($_POST['username'] ?? '');
-        $registerData['email'] = trim($_POST['email'] ?? '');
-    }
-
-    if (!validateCsrfToken($_POST['csrf_token'] ?? null)) {
-        $errorMessage = 'La session a expiré. Veuillez réessayer.';
-
-        if ($action === 'register') {
-            $registerErrors[] = $errorMessage;
-            $initialModal = 'register-modal';
-        } else {
-            $loginErrors[] = $errorMessage;
-            $initialModal = 'login-modal';
-        }
-
-        regenerateCsrfToken();
-    } else {
-        if ($action === 'login') {
-            $password = (string) ($_POST['password'] ?? '');
-            $result = attemptLogin($loginData['identifier'], $password);
-
-            if ($result['success']) {
-                header('Location: /index.php');
-                exit;
-            }
-
-            $loginErrors = array_merge($loginErrors, $result['errors']);
-            $initialModal = 'login-modal';
-        } elseif ($action === 'register') {
-            $password = (string) ($_POST['password'] ?? '');
-            $result = registerUser($registerData['username'], $registerData['email'], $password);
-
-            if ($result['success']) {
-                setPendingVerification([
-                    'user_id' => $result['user_id'],
-                    'email' => $result['email'],
-                    'code' => $result['verification_code'],
-                ]);
-
-                header('Location: /includes/verify.php');
-                exit;
-            } else {
-                $registerErrors = array_merge($registerErrors, $result['errors']);
-                $initialModal = 'register-modal';
-            }
-        }
-    }
-}
-
+$isAbonnementPage = strpos($currentPath, '/Abonnement/') !== false;
 $csrfToken = getCsrfToken();
-
-if (!$initialModal) {
-    $initialModal = 'refund-policy-modal';
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IntelligenceDev Scripts</title>
+    <title>Abonnement | IntelligenceDev</title>
     <link rel="icon" type="image/png" href="/img/Favicon.png">
     <link rel="stylesheet" href="/style.css">
 </head>
-<body<?= $initialModal ? ' data-initial-modal="' . htmlspecialchars($initialModal, ENT_QUOTES, 'UTF-8') . '"' : ''; ?>>
+<body>
 <header class="site-header">
     <div class="container">
         <div class="branding">
@@ -98,7 +26,7 @@ if (!$initialModal) {
         </div>
         <nav class="main-nav">
             <a href="/index.php" class="nav-link<?= $currentPath === '/index.php' ? ' active' : ''; ?>">Accueil</a>
-            <a href="/Abonnement/index.php" class="nav-link<?= strpos($currentPath, '/Abonnement/') !== false ? ' active' : ''; ?>">Abonnement</a>
+            <a href="/Abonnement/index.php" class="nav-link<?= $isAbonnementPage ? ' active' : ''; ?>">Abonnement</a>
             <a href="/Règlement/index.php" class="nav-link<?= $isReglementPage ? ' active' : ''; ?>">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
@@ -137,55 +65,87 @@ if (!$initialModal) {
     </div>
 </header>
 
-<main>
-    <?php if ($globalErrors): ?>
+<main class="subscriptions-page">
+    <section class="hero compact subscriptions-hero">
         <div class="container">
-            <div class="alert error">
-                <ul>
-                    <?php foreach ($globalErrors as $error): ?>
-                        <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <section class="hero">
-        <div class="container">
-            <h1>Boostez vos projets avec nos scripts prêts à l'emploi</h1>
-            <p>Découvrez une collection de scripts optimisés pour automatiser vos tâches et accélérer vos développements.</p>
-            <div class="hero-actions">
-                <a class="button primary" href="#catalogue">Explorer le catalogue</a>
-                <button type="button" class="button secondary" data-modal-target="register-modal">Rejoindre la communauté</button>
+            <p class="hero-kicker">Offres exclusives</p>
+            <h1>Choisissez l'abonnement adapté à vos projets</h1>
+            <p>Accédez à des scripts premium, des mises à jour prioritaires et une assistance dédiée pour accélérer vos développements.</p>
+            <div class="hero-meta">
+                <div class="pill">Accès immédiat</div>
+                <div class="pill pill-soft">Support prioritaire</div>
+                <div class="pill">Mises à jour incluses</div>
             </div>
         </div>
     </section>
 
-    <section class="features" id="catalogue">
+    <section class="subscriptions-grid" aria-labelledby="plans-title">
         <div class="container">
-            <h2>Pourquoi choisir IntelligenceDev ?</h2>
-            <div class="feature-grid">
-                <article class="feature">
-                    <h3>Performances optimisées</h3>
-                    <p>Nos scripts sont testés et optimisés pour offrir des performances rapides et fiables dans tous les environnements.</p>
+            <div class="section-header">
+                <p class="section-kicker">Comparatif</p>
+                <div>
+                    <h2 id="plans-title">3 niveaux d'abonnement</h2>
+                    <p class="section-subtitle">Sélectionnez le plan qui correspond le mieux à vos besoins et cliquez sur « Informations » pour découvrir le détail complet.</p>
+                </div>
+            </div>
+
+            <div class="plan-grid">
+                <article class="plan-card">
+                    <div class="plan-header">
+                        <p class="plan-badge">Essentiel</p>
+                        <h3>Starter</h3>
+                        <p class="plan-description">Pour débuter avec nos scripts et tester nos intégrations.</p>
+                    </div>
+                    <p class="plan-price"><span class="plan-amount">12€</span> / mois</p>
+                    <ul class="plan-features">
+                        <li>Accès à 15 scripts optimisés</li>
+                        <li>Mises à jour mensuelles</li>
+                        <li>Support communautaire</li>
+                    </ul>
+                    <div class="plan-actions">
+                        <button type="button" class="button primary full">Ajouter au panier</button>
+                        <button type="button" class="button secondary full" data-modal-target="plan-starter-modal">Informations</button>
+                    </div>
                 </article>
-                <article class="feature">
-                    <h3>Mises à jour régulières</h3>
-                    <p>Recevez des mises à jour fréquentes et profitez des améliorations basées sur les retours de la communauté.</p>
+
+                <article class="plan-card highlighted">
+                    <div class="plan-header">
+                        <p class="plan-badge accent">Populaire</p>
+                        <h3>Pro</h3>
+                        <p class="plan-description">Le meilleur rapport qualité/prix pour les équipes actives.</p>
+                    </div>
+                    <p class="plan-price"><span class="plan-amount">24€</span> / mois</p>
+                    <ul class="plan-features">
+                        <li>Tous les scripts actuels</li>
+                        <li>Mises à jour hebdomadaires</li>
+                        <li>Support prioritaire 24/7</li>
+                        <li>Intégrations Discord avancées</li>
+                    </ul>
+                    <div class="plan-actions">
+                        <button type="button" class="button primary full">Ajouter au panier</button>
+                        <button type="button" class="button secondary full" data-modal-target="plan-pro-modal">Informations</button>
+                    </div>
                 </article>
-                <article class="feature">
-                    <h3>Support dédié</h3>
-                    <p>Une équipe de support réactive est disponible pour répondre à vos questions et vous accompagner.</p>
+
+                <article class="plan-card">
+                    <div class="plan-header">
+                        <p class="plan-badge">Premium</p>
+                        <h3>Entreprise</h3>
+                        <p class="plan-description">Pour les organisations qui veulent un accompagnement complet.</p>
+                    </div>
+                    <p class="plan-price"><span class="plan-amount">55€</span> / mois</p>
+                    <ul class="plan-features">
+                        <li>Scripts illimités & bêta privée</li>
+                        <li>Gestionnaire de compte dédié</li>
+                        <li>Ateliers techniques mensuels</li>
+                        <li>SLA renforcé et supervision</li>
+                    </ul>
+                    <div class="plan-actions">
+                        <button type="button" class="button primary full">Ajouter au panier</button>
+                        <button type="button" class="button secondary full" data-modal-target="plan-enterprise-modal">Informations</button>
+                    </div>
                 </article>
             </div>
-        </div>
-    </section>
-
-    <section class="cta">
-        <div class="container">
-            <h2>Prêt à transformer vos idées en réalité ?</h2>
-            <p>Créez un compte gratuitement et accédez à tous nos scripts premium.</p>
-            <button type="button" class="button primary" data-modal-target="register-modal">Commencer maintenant</button>
         </div>
     </section>
 </main>
@@ -196,46 +156,65 @@ if (!$initialModal) {
     </div>
 </footer>
 
-<div class="modal" id="refund-policy-modal" role="dialog" aria-modal="true" aria-hidden="true">
+<div class="modal" id="plan-starter-modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" data-close-modal></div>
-    <div class="modal-content refund-policy">
+    <div class="modal-content">
         <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
-        <div class="modal-icon-badge" aria-hidden="true">
-            <span>🛡️</span>
-        </div>
-        <p class="modal-eyebrow">Informations importantes</p>
-        <h2>Politique de remboursement</h2>
-        <p class="modal-subtitle">Veuillez prendre connaissance de notre politique avant de parcourir nos offres.</p>
+        <p class="modal-eyebrow">Plan Starter</p>
+        <h2>Commencez en douceur</h2>
+        <p class="modal-subtitle">Idéal pour tester nos scripts, prototyper vos idées et prendre en main notre écosystème.</p>
         <div class="modal-body">
-            <div class="policy-highlight">
-                <p><strong>Les scripts numériques sont livrés instantanément après votre achat.</strong></p>
-                <p>Merci de lire attentivement les conditions ci-dessous avant de poursuivre votre navigation.</p>
-            </div>
-            <ul class="policy-list">
-                <li>
-                    <span class="policy-bullet" aria-hidden="true">✓</span>
-                    <div>
-                        <h3>Achats définitifs</h3>
-                        <p>Une fois le téléchargement disponible, la commande est considérée comme finale.</p>
-                    </div>
-                </li>
-                <li>
-                    <span class="policy-bullet" aria-hidden="true">✓</span>
-                    <div>
-                        <h3>Remboursements sous 48&nbsp;heures.</h3>
-                        <p>
-                            Un remboursement peut être envisagé uniquement en cas de dysfonctionnement avéré signalé sous 24 heures. <br>
-                            <span class="refund-notice2">À condition que les scripts ne soient pas open source.</span>
-                        </p>
-                    </div>
-                </li>
+            <ul class="modal-list">
+                <li>Accès instantané aux 15 scripts essentiels.</li>
+                <li>Mises à jour mensuelles avec alertes e-mail.</li>
+                <li>Accès à la documentation détaillée et aux guides vidéo.</li>
             </ul>
-            <p class="policy-move-up">
-                En continuant votre navigation, vous confirmez avoir pris connaissance et accepté cette politique.
-            </p>
+            <p class="modal-note">Découvrez un tutoriel rapide : <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank" rel="noopener">voir la vidéo de présentation</a>.</p>
         </div>
         <div class="modal-actions">
-            <button type="button" class="button primary full" data-close-modal>J'ai compris</button>
+            <button type="button" class="button primary full">Ajouter au panier</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="plan-pro-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-overlay" data-close-modal></div>
+    <div class="modal-content">
+        <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
+        <p class="modal-eyebrow">Plan Pro</p>
+        <h2>Le choix des équipes actives</h2>
+        <p class="modal-subtitle">Pensé pour les développeurs qui veulent un flux continu de nouveautés et un support réactif.</p>
+        <div class="modal-body">
+            <ul class="modal-list">
+                <li>Accès complet au catalogue et aux futures sorties.</li>
+                <li>Hotfix prioritaires et canal de support dédié.</li>
+                <li>Connecteurs avancés pour Discord et API partenaires.</li>
+            </ul>
+            <p class="modal-note">Présentation complète en vidéo : <a href="https://youtu.be/6_b7RDuLwcI" target="_blank" rel="noopener">voir la démonstration Pro</a>.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="button primary full">Ajouter au panier</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="plan-enterprise-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-overlay" data-close-modal></div>
+    <div class="modal-content">
+        <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
+        <p class="modal-eyebrow">Plan Entreprise</p>
+        <h2>Accompagnement sur mesure</h2>
+        <p class="modal-subtitle">Bénéficiez d'un suivi dédié, d'ateliers privés et d'un SLA adapté à vos enjeux critiques.</p>
+        <div class="modal-body">
+            <ul class="modal-list">
+                <li>Accès anticipé aux versions bêta et environnements de staging.</li>
+                <li>Sessions techniques mensuelles avec nos experts.</li>
+                <li>Supervision, monitoring et assistance renforcée.</li>
+            </ul>
+            <p class="modal-note">Explorez le tour complet : <a href="https://youtu.be/V-_O7nl0Ii0" target="_blank" rel="noopener">voir la visite Entreprise</a>.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="button primary full">Ajouter au panier</button>
         </div>
     </div>
 </div>
@@ -244,28 +223,14 @@ if (!$initialModal) {
     <div class="modal-overlay" data-close-modal></div>
     <div class="modal-content">
         <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
-        <h2>Connexion</h2>
-        <p class="modal-subtitle">Connectez-vous pour accéder à vos scripts et à votre espace personnel.</p>
-
-        <?php if ($loginErrors): ?>
-            <div class="alert error">
-                <ul>
-                    <?php foreach ($loginErrors as $error): ?>
-                        <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-
-        <form method="post" class="form">
+        <p class="modal-subtitle">Connectez-vous pour poursuivre vos achats et accéder à vos scripts.</p>
+        <form class="form" method="post" action="/index.php">
             <input type="hidden" name="action" value="login">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
-            <label for="login-identifier">Nom d'utilisateur ou e-mail</label>
-            <input type="text" id="login-identifier" name="identifier" value="<?= htmlspecialchars($loginData['identifier'], ENT_QUOTES, 'UTF-8'); ?>" required>
-
+            <label for="login-identifier">E-mail ou nom d'utilisateur</label>
+            <input type="text" id="login-identifier" name="identifier" required>
             <label for="login-password">Mot de passe</label>
             <input type="password" id="login-password" name="password" required>
-
             <button type="submit" class="button primary full">Se connecter</button>
         </form>
         <p class="form-footer">Pas encore de compte ? <button type="button" class="link-button" data-switch-modal="register-modal">Inscrivez-vous ici</button>.</p>
@@ -276,35 +241,16 @@ if (!$initialModal) {
     <div class="modal-overlay" data-close-modal></div>
     <div class="modal-content">
         <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
-        <h2>Créer un compte</h2>
-        <p class="modal-subtitle">Inscrivez-vous pour accéder à notre catalogue de scripts exclusifs.</p>
-
-        <?php if ($registerSuccess): ?>
-            <div class="alert success">Compte créé avec succès ! Vous pouvez maintenant vous connecter.</div>
-        <?php endif; ?>
-
-        <?php if ($registerErrors): ?>
-            <div class="alert error">
-                <ul>
-                    <?php foreach ($registerErrors as $error): ?>
-                        <li><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-
-        <form method="post" class="form">
+        <p class="modal-subtitle">Créez un compte pour gérer vos abonnements et vos téléchargements.</p>
+        <form class="form" method="post" action="/index.php">
             <input type="hidden" name="action" value="register">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
             <label for="register-username">Nom d'utilisateur</label>
-            <input type="text" id="register-username" name="username" value="<?= htmlspecialchars($registerData['username'], ENT_QUOTES, 'UTF-8'); ?>" required>
-
+            <input type="text" id="register-username" name="username" required>
             <label for="register-email">Adresse e-mail</label>
-            <input type="email" id="register-email" name="email" value="<?= htmlspecialchars($registerData['email'], ENT_QUOTES, 'UTF-8'); ?>" required>
-
+            <input type="email" id="register-email" name="email" required>
             <label for="register-password">Mot de passe</label>
             <input type="password" id="register-password" name="password" required>
-
             <button type="submit" class="button primary full">Créer mon compte</button>
         </form>
         <p class="form-footer">Déjà membre ? <button type="button" class="link-button" data-switch-modal="login-modal">Connectez-vous ici</button>.</p>
@@ -337,16 +283,13 @@ if (!$initialModal) {
         }
     }
 
-    function handleOpenClick(event) {
-        const target = event.currentTarget.getAttribute('data-modal-target');
-        if (!target) {
-            return;
-        }
-        openModal(target);
-    }
-
     document.querySelectorAll('[data-modal-target]').forEach((trigger) => {
-        trigger.addEventListener('click', handleOpenClick);
+        trigger.addEventListener('click', (event) => {
+            const target = event.currentTarget.getAttribute('data-modal-target');
+            if (target) {
+                openModal(target);
+            }
+        });
     });
 
     document.querySelectorAll('.modal').forEach((modal) => {
@@ -385,11 +328,6 @@ if (!$initialModal) {
             openModal(target);
         });
     });
-
-    const initialModal = body.getAttribute('data-initial-modal');
-    if (initialModal) {
-        openModal(initialModal);
-    }
 })();
 
 (function () {
@@ -441,21 +379,13 @@ if (!$initialModal) {
                 });
             }
 
-            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-            panel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
-        });
-
-        panel.addEventListener('click', (event) => {
-            event.stopPropagation();
+            toggle.setAttribute('aria-expanded', String(isOpen));
+            panel.setAttribute('aria-hidden', String(!isOpen));
         });
     });
 
-    document.addEventListener('click', () => {
-        closeAll();
-    });
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
+    document.addEventListener('click', (event) => {
+        if (![...menus].some((menu) => menu.contains(event.target))) {
             closeAll();
         }
     });
