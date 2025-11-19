@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../functions.php';
 
 $user = getCurrentUser();
+$currentPath = $_SERVER['SCRIPT_NAME'] ?? '';
+$isReglementPage = strpos($currentPath, '/Règlement/') !== false;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -21,8 +23,8 @@ $user = getCurrentUser();
             </a>
         </div>
         <nav class="main-nav">
-            <a href="/index.php" class="nav-link">Accueil</a>
-            <a href="/Règlement/index.php" class="nav-link active">Règlement</a>
+            <a href="/index.php" class="nav-link<?= $currentPath === '/index.php' ? ' active' : ''; ?>">Accueil</a>
+            <a href="/Règlement/index.php" class="nav-link<?= $isReglementPage ? ' active' : ''; ?>">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
                     <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>

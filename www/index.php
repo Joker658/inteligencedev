@@ -15,6 +15,9 @@ $registerData = [
     'email' => ''
 ];
 
+$currentPath = $_SERVER['SCRIPT_NAME'] ?? '';
+$isReglementPage = strpos($currentPath, '/Règlement/') !== false;
+
 if (isPostRequest()) {
     $action = $_POST['action'] ?? '';
 
@@ -90,8 +93,8 @@ $csrfToken = getCsrfToken();
             </a>
         </div>
         <nav class="main-nav">
-            <a href="/index.php" class="nav-link">Accueil</a>
-            <a href="/Règlement/index.php" class="nav-link">Règlement</a>
+            <a href="/index.php" class="nav-link<?= $currentPath === '/index.php' ? ' active' : ''; ?>">Accueil</a>
+            <a href="/Règlement/index.php" class="nav-link<?= $isReglementPage ? ' active' : ''; ?>">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
                     <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>
