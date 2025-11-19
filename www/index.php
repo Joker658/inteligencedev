@@ -173,18 +173,43 @@ if (!$initialModal) {
 
 <div class="modal" id="refund-policy-modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" data-close-modal></div>
-    <div class="modal-content">
+    <div class="modal-content refund-policy">
         <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
+        <div class="modal-icon-badge" aria-hidden="true">
+            <span>🛡️</span>
+        </div>
+        <p class="modal-eyebrow">Informations importantes</p>
         <h2>Politique de remboursement</h2>
         <p class="modal-subtitle">Veuillez prendre connaissance de notre politique avant de parcourir nos offres.</p>
         <div class="modal-body">
-            <p>Les scripts numériques proposés sur IntelligenceDev sont livrés immédiatement après l'achat. Par conséquent&nbsp;:</p>
-            <ul>
-                <li>Les achats sont définitifs dès que le téléchargement est disponible.</li>
-                <li>Les remboursements ne sont accordés qu'en cas de dysfonctionnement avéré et signalé sous 48&nbsp;heures.</li>
-                <li>Aucun remboursement ne peut être effectué si le script a été partagé ou modifié.</li>
+            <div class="policy-highlight">
+                <p><strong>Les scripts numériques sont livrés instantanément après votre achat.</strong></p>
+                <p>Merci de lire attentivement les conditions ci-dessous avant de poursuivre votre navigation.</p>
+            </div>
+            <ul class="policy-list">
+                <li>
+                    <span class="policy-bullet" aria-hidden="true">✓</span>
+                    <div>
+                        <h3>Achats définitifs</h3>
+                        <p>Une fois le téléchargement disponible, la commande est considérée comme finale.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="policy-bullet" aria-hidden="true">✓</span>
+                    <div>
+                        <h3>Assistance sous 48&nbsp;h</h3>
+                        <p>Un remboursement peut être envisagé uniquement en cas de dysfonctionnement avéré signalé sous 48&nbsp;heures.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="policy-bullet" aria-hidden="true">✓</span>
+                    <div>
+                        <h3>Usage responsable</h3>
+                        <p>Aucun remboursement ne sera effectué si le script a été partagé, modifié ou redistribué.</p>
+                    </div>
+                </li>
             </ul>
-            <p>En continuant votre navigation, vous reconnaissez avoir pris connaissance de ces conditions.</p>
+            <p class="policy-footer">En continuant votre navigation, vous confirmez avoir pris connaissance et accepté cette politique.</p>
         </div>
         <div class="modal-actions">
             <button type="button" class="button primary full" data-close-modal>J'ai compris</button>
