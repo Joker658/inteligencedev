@@ -47,6 +47,7 @@ $verificationStatus = !empty($user['email_verified_at'])
         </div>
         <nav class="main-nav">
             <a href="/index.php" class="nav-link<?= $currentPath === '/index.php' ? ' active' : ''; ?>">Accueil</a>
+            <a href="/Abonnement/index.php" class="nav-link<?= strpos($currentPath, '/Abonnement/') !== false ? ' active' : ''; ?>">Abonnement</a>
             <a href="/Règlement/index.php" class="nav-link<?= $isReglementPage ? ' active' : ''; ?>">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
