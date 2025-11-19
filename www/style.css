@@ -388,7 +388,19 @@ body {
 
 .refund-notice {
     margin-top: 1rem;
-    color: var(--accent-light);
+    color: #ff0000;
+}
+
+.refund-notice2 {
+    margin-top: 1rem;
+    color: #ff0000;
+    font-weight: 600;
+    display: block;
+}
+
+.policy-move-up {
+    margin-bottom: 10px;
+    display: block;
 }
 
 .reglement-cta {
@@ -500,8 +512,8 @@ body {
     border: 1px solid var(--card-border);
     padding: 2.25rem;
     border-radius: 24px;
-    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.5);
-    width: min(420px, 90vw);
+    box-shadow: 0 28px 30px rgba(15, 23, 42, 0.5);
+    width: min(460px, 92vw);
     z-index: 1;
 }
 
@@ -510,8 +522,9 @@ body {
         radial-gradient(circle at bottom, rgba(99, 102, 241, 0.25), transparent 40%),
         var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    padding-top: 2.75rem;
+    padding-top: 1%;
     text-align: left;
+    width: min(520px, 92vw);
 }
 
 .modal-icon-badge {
