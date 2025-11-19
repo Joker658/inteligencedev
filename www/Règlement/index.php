@@ -23,8 +23,8 @@ $isReglementPage = strpos($currentPath, '/Règlement/') !== false;
             </a>
         </div>
         <nav class="main-nav">
-            <a href="/index.php" class="nav-link<?= $currentPath === '/index.php' ? ' active' : ''; ?>">Accueil</a>
-            <a href="/Règlement/index.php" class="nav-link<?= $isReglementPage ? ' active' : ''; ?>">Règlement</a>
+            <a href="../" class="nav-link<?= $currentPath === '../' ? ' active' : ''; ?>">Accueil</a>
+            <a href="./Règlement/" class="nav-link<?= $isReglementPage ? ' active' : ''; ?>">Règlement</a>
             <div class="nav-actions">
                 <?php if ($user): ?>
                     <span class="welcome">Bonjour, <?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?> !</span>
@@ -147,8 +147,8 @@ $isReglementPage = strpos($currentPath, '/Règlement/') !== false;
                     <li>Fournissez des informations complètes pour accélérer l'analyse de vos incidents ou demandes de développement personnalisé.</li>
                     <li>Tout paiement lancé vaut acceptation expresse des présentes conditions.</li>
                 </ul>
-                <p class="refund-notice"><strong>Politique de remboursement&nbsp;: nous remboursons sous un délai maximum de 10 jours et uniquement pour les scripts non open source.</strong></p>
-                <p>En cas de litige, une preuve d'achat et la description du problème devront être fournies pour initier la procédure.</p>
+                <p class="refund-notice"><strong> Politique de remboursement&nbsp;: nous remboursons sous un délai maximum de 10 jours et uniquement pour les scripts non open source.</strong></p>
+                <p> En cas de litige, une preuve d'achat et la description du problème devront être fournies pour initier la procédure.</p>
             </article>
 
             <article class="reglement-block" id="securite">
