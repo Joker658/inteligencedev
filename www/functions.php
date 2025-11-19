@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/AuthService.php';
+require_once __DIR__ . '/includes/AnalyticsService.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -20,6 +21,17 @@ function getAuthService(): AuthService
 
     if (!$service instanceof AuthService) {
         $service = new AuthService(getDatabaseConnection());
+    }
+
+    return $service;
+}
+
+function getAnalyticsService(): AnalyticsService
+{
+    static $service = null;
+
+    if (!$service instanceof AnalyticsService) {
+        $service = new AnalyticsService(getDatabaseConnection());
     }
 
     return $service;

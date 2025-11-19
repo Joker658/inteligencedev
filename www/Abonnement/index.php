@@ -6,6 +6,7 @@ $currentPath = $_SERVER['SCRIPT_NAME'] ?? '';
 $isReglementPage = strpos($currentPath, '/Règlement/') !== false;
 $isAbonnementPage = strpos($currentPath, '/Abonnement/') !== false;
 $csrfToken = getCsrfToken();
+$analytics = getAnalyticsService()->getHeroMetrics();
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -86,16 +87,16 @@ linejoin="round" />
                     </div>
                     <div class="hero-stats">
                         <div class="stat">
-                            <p class="stat-value">12K+</p>
+                            <p class="stat-value"><?= number_format($analytics['monthly_downloads']); ?>+</p>
                             <p class="stat-label">Téléchargements mensuels</p>
                         </div>
                         <div class="stat">
-                            <p class="stat-value">98%</p>
+                            <p class="stat-value"><?= number_format($analytics['satisfaction_rate'], 0); ?>%</p>
                             <p class="stat-label">Clients satisfaits</p>
                         </div>
                         <div class="stat">
-                            <p class="stat-value">24/7</p>
-                            <p class="stat-label">Support prioritaire</p>
+                            <p class="stat-value"><?= htmlspecialchars($analytics['support_availability'], ENT_QUOTES, 'UTF-8'); ?></p>
+                            <p class="stat-label">Support prioritaire (données réelles)</p>
                         </div>
                     </div>
                 </div>

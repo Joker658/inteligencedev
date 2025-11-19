@@ -202,6 +202,24 @@ function initializeMysqlDatabase(PDO $pdo): void
     ensureUserColumn($pdo, 'verification_code_expires_at', 'DATETIME DEFAULT NULL');
     ensureUserColumn($pdo, 'email_verified_at', 'DATETIME DEFAULT NULL');
 
+    if (!databaseTableExists($pdo, 'site_metrics')) {
+        try {
+            $pdo->exec(
+                'CREATE TABLE IF NOT EXISTS site_metrics (
+                    metric_key VARCHAR(100) NOT NULL PRIMARY KEY,
+                    metric_value VARCHAR(255) NOT NULL,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+            );
+        } catch (PDOException $exception) {
+            if (!databaseTableExists($pdo, 'site_metrics') || !isPrivilegeError($exception)) {
+                throw $exception;
+            }
+
+            error_log(sprintf('Unable to create site_metrics table automatically: %s', $exception->getMessage()));
+        }
+    }
+
     $sql = <<<'SQL'
 UPDATE users
 SET email_verified_at = COALESCE(email_verified_at, created_at)
@@ -224,6 +242,14 @@ function initializeSqliteDatabase(PDO $pdo): void
             verification_code_expires_at DATETIME DEFAULT NULL,
             email_verified_at DATETIME DEFAULT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )'
+    );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS site_metrics (
+            metric_key VARCHAR(100) NOT NULL PRIMARY KEY,
+            metric_value VARCHAR(255) NOT NULL,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )'
     );
 
