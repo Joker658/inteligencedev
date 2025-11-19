@@ -77,6 +77,13 @@ body {
     align-items: center;
 }
 
+.nav-actions .button {
+    min-width: 150px;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .welcome {
     color: var(--text-muted);
 }
@@ -629,6 +636,11 @@ input:focus {
         margin-left: 0;
         width: 100%;
         justify-content: flex-start;
+    }
+
+    .nav-actions .button {
+        width: 100%;
+        min-width: 0;
     }
 
     .hero-actions {
