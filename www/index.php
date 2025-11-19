@@ -197,19 +197,17 @@ if (!$initialModal) {
                 <li>
                     <span class="policy-bullet" aria-hidden="true">✓</span>
                     <div>
-                        <h3>Assistance sous 48&nbsp;h</h3>
-                        <p>Un remboursement peut être envisagé uniquement en cas de dysfonctionnement avéré signalé sous 48&nbsp;heures.</p>
-                    </div>
-                </li>
-                <li>
-                    <span class="policy-bullet" aria-hidden="true">✓</span>
-                    <div>
-                        <h3>Usage responsable</h3>
-                        <p>Aucun remboursement ne sera effectué si le script a été partagé, modifié ou redistribué.</p>
+                        <h3>Remboursements sous 48&nbsp;heures.</h3>
+                        <p>
+                            Un remboursement peut être envisagé uniquement en cas de dysfonctionnement avéré signalé sous 24 heures. <br>
+                            <span class="refund-notice2">À condition que les scripts ne soient pas open source.</span>
+                        </p>
                     </div>
                 </li>
             </ul>
-            <p class="policy-footer">En continuant votre navigation, vous confirmez avoir pris connaissance et accepté cette politique.</p>
+            <p class="policy-move-up">
+                En continuant votre navigation, vous confirmez avoir pris connaissance et accepté cette politique.
+            </p>
         </div>
         <div class="modal-actions">
             <button type="button" class="button primary full" data-close-modal>J'ai compris</button>
