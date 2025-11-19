@@ -74,6 +74,10 @@ if (isPostRequest()) {
 }
 
 $csrfToken = getCsrfToken();
+
+if (!$initialModal) {
+    $initialModal = 'refund-policy-modal';
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -166,6 +170,27 @@ $csrfToken = getCsrfToken();
         <p>&copy; <?= date('Y'); ?> IntelligenceDev. Tous droits réservés.</p>
     </div>
 </footer>
+
+<div class="modal" id="refund-policy-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-overlay" data-close-modal></div>
+    <div class="modal-content">
+        <button type="button" class="modal-close" aria-label="Fermer" data-close-modal>&times;</button>
+        <h2>Politique de remboursement</h2>
+        <p class="modal-subtitle">Veuillez prendre connaissance de notre politique avant de parcourir nos offres.</p>
+        <div class="modal-body">
+            <p>Les scripts numériques proposés sur IntelligenceDev sont livrés immédiatement après l'achat. Par conséquent&nbsp;:</p>
+            <ul>
+                <li>Les achats sont définitifs dès que le téléchargement est disponible.</li>
+                <li>Les remboursements ne sont accordés qu'en cas de dysfonctionnement avéré et signalé sous 48&nbsp;heures.</li>
+                <li>Aucun remboursement ne peut être effectué si le script a été partagé ou modifié.</li>
+            </ul>
+            <p>En continuant votre navigation, vous reconnaissez avoir pris connaissance de ces conditions.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="button primary full" data-close-modal>J'ai compris</button>
+        </div>
+    </div>
+</div>
 
 <div class="modal" id="login-modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" data-close-modal></div>
