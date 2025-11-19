@@ -33,10 +33,12 @@ $csrfToken = getCsrfToken();
                     <div class="user-menu" data-user-menu>
                         <button type="button" class="user-menu-toggle" aria-haspopup="true" aria-expanded="false">
                             <span class="user-menu-toggle-text">Bonjour</span>
-                            <span class="user-menu-toggle-name"><?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            <span class="user-menu-toggle-name"><?= htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>
+</span>
                             <span class="user-menu-toggle-icon" aria-hidden="true">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-
+linejoin="round" />
                                 </svg>
                             </span>
                         </button>
@@ -68,13 +70,107 @@ $csrfToken = getCsrfToken();
 <main class="subscriptions-page">
     <section class="hero compact subscriptions-hero">
         <div class="container">
-            <p class="hero-kicker">Offres exclusives</p>
-            <h1>Choisissez l'abonnement adapté à vos projets</h1>
-            <p>Accédez à des scripts premium, des mises à jour prioritaires et une assistance dédiée pour accélérer vos développements.</p>
-            <div class="hero-meta">
-                <div class="pill">Accès immédiat</div>
-                <div class="pill pill-soft">Support prioritaire</div>
-                <div class="pill">Mises à jour incluses</div>
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <p class="hero-kicker">Offres exclusives</p>
+                    <h1>Choisissez l'abonnement adapté à vos projets</h1>
+                    <p>Accédez à des scripts premium, des mises à jour prioritaires et une assistance dédiée pour accélérer vos développements.</p>
+                    <div class="hero-meta">
+                        <div class="pill">Accès immédiat</div>
+                        <div class="pill pill-soft">Support prioritaire</div>
+                        <div class="pill">Mises à jour incluses</div>
+                    </div>
+                    <div class="hero-actions">
+                        <button type="button" class="button primary" data-modal-target="plan-pro-modal">Voir le plan Populaire</button>
+                        <button type="button" class="button ghost" data-modal-target="plan-starter-modal">Découvrir les bases</button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <p class="stat-value">12K+</p>
+                            <p class="stat-label">Téléchargements mensuels</p>
+                        </div>
+                        <div class="stat">
+                            <p class="stat-value">98%</p>
+                            <p class="stat-label">Clients satisfaits</p>
+                        </div>
+                        <div class="stat">
+                            <p class="stat-value">24/7</p>
+                            <p class="stat-label">Support prioritaire</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-panel">
+                    <div class="floating-card">
+                        <div class="floating-header">
+                            <div class="pulse"></div>
+                            <div>
+                                <p class="floating-kicker">Nouveauté</p>
+                                <p class="floating-title">Pack Automation 2.0</p>
+                            </div>
+                            <span class="pill">Inclus Pro</span>
+                        </div>
+                        <ul class="floating-list">
+                            <li><span class="dot success"></span>Connecteurs Discord renforcés</li>
+                            <li><span class="dot"></span>Scripts optimisés pour VPS</li>
+                            <li><span class="dot"></span>Templates prêts à déployer</li>
+                        </ul>
+                        <div class="floating-footer">
+                            <p>Livraison immédiate, mises à jour hebdomadaires et tutoriels vidéo pour être opérationnel en moins de 10 minutes.</p>
+                            <button type="button" class="button primary full" data-modal-target="plan-pro-modal">Accéder au pack</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="value-props" aria-labelledby="value-title">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-kicker">Pourquoi nous choisir ?</p>
+                <div>
+                    <h2 id="value-title">Une expérience pensée pour les développeurs</h2>
+                    <p class="section-subtitle">Chaque abonnement comprend des ressources concrètes pour livrer plus vite, avec une qualité irréprochable.</p>
+                </div>
+            </div>
+            <div class="value-grid">
+                <article class="value-card">
+                    <div class="icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12l4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Code prêt à l'emploi</h3>
+                    <p>Scripts commentés, revus par nos pairs et optimisés pour les hébergements mutualisés comme les serveurs dédiés.</p>
+                </article>
+                <article class="value-card">
+                    <div class="icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3>Livraison express</h3>
+                    <p>Accédez immédiatement à vos achats et recevez les mises à jour dès leur publication, sans action supplémentaire.</p>
+                </article>
+                <article class="value-card">
+                    <div class="icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L6.5 20l2-7L3 9h7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Support expert</h3>
+                    <p>Équipe francophone disponible en continu, avec des guides détaillés et des sessions live en cas de besoin.</p>
+                </article>
+                <article class="value-card">
+                    <div class="icon-circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h16M4 12h10M4 17h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>Feuille de route claire</h3>
+                    <p>Accès aux prochains modules, aux dates de livraison estimées et aux demandes prioritaires de la communauté.</p>
+                </article>
             </div>
         </div>
     </section>
@@ -86,6 +182,10 @@ $csrfToken = getCsrfToken();
                 <div>
                     <h2 id="plans-title">3 niveaux d'abonnement</h2>
                     <p class="section-subtitle">Sélectionnez le plan qui correspond le mieux à vos besoins et cliquez sur « Informations » pour découvrir le détail complet.</p>
+                </div>
+                <div class="section-tagline">
+                    <span class="pill pill-soft">Sans engagement</span>
+                    <span class="pill">Essai possible sur demande</span>
                 </div>
             </div>
 
@@ -101,6 +201,7 @@ $csrfToken = getCsrfToken();
                         <li>Accès à 15 scripts optimisés</li>
                         <li>Mises à jour mensuelles</li>
                         <li>Support communautaire</li>
+                        <li>Guides d'installation rapides</li>
                     </ul>
                     <div class="plan-actions">
                         <button type="button" class="button primary full">Ajouter au panier</button>
@@ -120,6 +221,7 @@ $csrfToken = getCsrfToken();
                         <li>Mises à jour hebdomadaires</li>
                         <li>Support prioritaire 24/7</li>
                         <li>Intégrations Discord avancées</li>
+                        <li>Accès aux packs automation</li>
                     </ul>
                     <div class="plan-actions">
                         <button type="button" class="button primary full">Ajouter au panier</button>
@@ -139,12 +241,76 @@ $csrfToken = getCsrfToken();
                         <li>Gestionnaire de compte dédié</li>
                         <li>Ateliers techniques mensuels</li>
                         <li>SLA renforcé et supervision</li>
+                        <li>Co-pilotage de déploiement</li>
                     </ul>
                     <div class="plan-actions">
                         <button type="button" class="button primary full">Ajouter au panier</button>
                         <button type="button" class="button secondary full" data-modal-target="plan-enterprise-modal">Informations</button>
                     </div>
                 </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="bonus-band">
+        <div class="container bonus-grid">
+            <div>
+                <p class="section-kicker">Bonus immédiats</p>
+                <h2>Des ressources exclusives offertes dès votre inscription</h2>
+                <p class="section-subtitle">Bibliothèque de snippets, modèles de tickets de support et checklists de mise en production.</p>
+            </div>
+            <div class="bonus-list">
+                <div class="bonus-item">
+                    <span class="dot success"></span>
+                    <div>
+                        <p class="bonus-title">Accès au Lab privé</p>
+                        <p class="bonus-text">Bêta-test des prochains modules et influence sur la feuille de route.</p>
+                    </div>
+                </div>
+                <div class="bonus-item">
+                    <span class="dot"></span>
+                    <div>
+                        <p class="bonus-title">Templates Discord prêts à l'emploi</p>
+                        <p class="bonus-text">Salons, rôles et automatisations préconfigurées.</p>
+                    </div>
+                </div>
+                <div class="bonus-item">
+                    <span class="dot"></span>
+                    <div>
+                        <p class="bonus-title">Pack onboarding équipe</p>
+                        <p class="bonus-text">Guide PDF + checklists pour standardiser vos déploiements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq" aria-labelledby="faq-title">
+        <div class="container">
+            <div class="section-header">
+                <p class="section-kicker">Questions fréquentes</p>
+                <div>
+                    <h2 id="faq-title">Tout savoir avant de souscrire</h2>
+                    <p class="section-subtitle">Transparence sur la facturation, la gestion des licences et le support.</p>
+                </div>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>Puis-je changer de plan à tout moment ?</h3>
+                    <p>Oui, vous pouvez passer à une formule supérieure ou inférieure en quelques clics. Le prorata est calculé automatiquement.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Les mises à jour sont-elles facturées ?</h3>
+                    <p>Non, elles sont incluses dans tous les abonnements. Les clients Pro et Entreprise reçoivent en plus les hotfix prioritaires.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Comment fonctionne l'assistance ?</h3>
+                    <p>Le support communautaire est disponible pour tous. Les plans Pro et Entreprise bénéficient d'un canal dédié et de réponses prioritaires.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Proposez-vous un remboursement ?</h3>
+                    <p>Si le service ne correspond pas à vos attentes dans les 7 premiers jours, contactez-nous : nous étudierons un geste commercial au cas par cas.</p>
+                </div>
             </div>
         </div>
     </section>
