@@ -9,7 +9,7 @@ declare(strict_types=1);
 // modifier ce fichier (ex. dans Docker ou sur un hébergement mutualisé).
 // -----------------------------------------------------------------------------
 
-const DB_DEFAULT_DRIVER = 'mysql';
+const DB_DEFAULT_DRIVER = 'sqlite';
 const DB_DEFAULT_HOST = '86.196.245.7';
 const DB_DEFAULT_PORT = 3306;
 const DB_DEFAULT_NAME = 's186_intelligencedev';
